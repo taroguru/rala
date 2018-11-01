@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#ffffffff</color>
+    <color name="base_black">#ff141414</color>
+    <color name="base_white">#ffffffff</color>
+
+
+    <color name="textblack">#252525</color>
+
+    <!-- 앱의 시그니쳐컬러 -->
+    <color name="signature_color">@color/white</color>
+    <color name="signature_color_accent">#1B5E20</color>
+
+    <!-- drawer color-->
+    <color name="text_playitem">#ff757575</color>
+    <color name="group_item_color">@color/player_button_normal</color>
+    <color name="child_item_color">#fff6f6f6</color>
+<!--    <color name="group_item_color">#fff6f6f6</color>
+    <color name="child_item_color">#fff0f0f0</color> -->
+
+    <!-- player color-->
+    <color name="player_background">#ffe6e6e6</color>
+    <!-- normal, press, activate -->
+    <color name="player_button_normal">@color/signature_color</color>
+    <color name="player_button_text_color">@color/textblack</color>
+
+    <color name="seekbar_grey">#c6c6c6</color>
+    <color name="dark_grey">#424242</color>
+    <color name="button_grey">#757575</color>
+
+
+</resources>
+
+
+<!--
+<color name="cyan">#ff00bcd4</color>
+    <color name="deep_orange">#ffFF5722</color>
+    <color name="teal">#ff009688</color>
+    <color name="amber">#ffffc107</color>
+    <color name="indigo">#ff3F51B5</color>
+    <color name="pink">#ffe91e63</color>
+
+    <color name="line">#ffcddc39</color>
+    <color name="brown">#ff795548</color>
+    -->

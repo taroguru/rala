@@ -1,0 +1,217 @@
+
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here.  <item name="colorPrimary">#3F51B5</item>-->
+        <item name="colorPrimary">@color/white</item>
+        <!-- Light Indigo  <item name="colorPrimaryDark">#3949AB</item> -->
+        <item name="colorPrimaryDark">#BDBDBD</item>
+        <!-- Dark Indigo -->
+        <item name="colorAccent">@color/signature_color_accent</item>
+    </style>
+    <style name="AppTheme" parent="AppTheme.Base"></style>
+
+    <!-- toolbar -->
+    <style name="MainToolBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:background">?android:attr/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/base_black</item>
+        <item name="android:contentInsetStart">0dp</item>
+    </style>
+
+    <!-- tablayout-->
+    <style name="MainTabLayout" parent="Base.Widget.Design.TabLayout">
+        <item name="tabTextAppearance">@style/TabTextColor</item>
+        <item name="tabSelectedTextColor">#000000</item>
+    </style>
+
+    <style name="TabTextColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#505050</item>
+    </style>
+
+    <style name="TabLayout_Theme" parent="@style/AppTheme">
+        <item name="android:maxLines">1</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">10dp</item>
+    </style>
+
+
+    <!-- playerfragment -->
+    <!-- player buttons -->
+    <style name="PlayerButton" parent="CardView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:stateListAnimator">@drawable/player_button</item>
+        <item name="android:selectableItemBackground">@color/white</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="android:textColor">@color/player_button_text_color</item>
+        <item name="android:layout_marginTop">1dp</item>
+        <item name="android:layout_marginLeft">1dp</item>
+    </style>
+
+    <style name="BottomPlayerButton" parent="CardView">
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:stateListAnimator">@drawable/player_button</item>
+        <item name="android:selectableItemBackground">@color/white</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">1dp</item>
+        <item name="android:textColor">@color/player_button_text_color</item>
+        <item name="android:layout_marginTop">1dp</item>
+        <item name="android:layout_marginLeft">1dp</item>
+    </style>
+
+    <style name="BottomPlayerButtonImage" >
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="HeaderItem" parent="CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:stateListAnimator">@drawable/listitem_selector</item>
+        <item name="cardBackgroundColor">@color/group_item_color</item>
+        <item name="cardElevation">10dp</item>
+        <item name="android:textColor">@color/player_button_text_color</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="android:translationZ">5dp</item>
+    </style>
+
+    <style name="ChildItem" parent="CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:stateListAnimator">@drawable/listitem_selector</item>
+        <item name="cardElevation">1dp</item>
+        <item name=":cardBackgroundColor">@color/child_item_color</item>
+        <item name="android:textColor">@color/player_button_text_color</item>
+        <item name="cardCornerRadius">0dp</item>
+    </style>
+
+<!-- fonts -->
+    <style name="PlayButtonLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="SwitchLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">27dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+    <style name="TimeLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">18dp</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+    <style name="StartActivityTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:textSize">120sp</item>
+        <item name="android:fontFamily">@font/nanumsquarelight</item>
+    </style>
+
+    <style name="ItemIndexFont">
+        <item name="android:textSize">16sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:color">@color/text_playitem</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="ItemTitleFont">
+        <item name="android:textSize">16sp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:color">@color/text_playitem</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="ItemSecondLineFont">
+        <item name="android:textSize">10sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:color">@color/text_playitem</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="ItemTimeFont">
+        <item name="android:textSize">16sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:color">@color/text_playitem</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="BottomTextFont">
+        <item name="android:textSize">24sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:color">@color/text_playitem</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="notiTitleText" >
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/textblack</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <style name="notiArtist" >
+        <item name="android:textSize">12sp</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/dark_grey</item>
+        <item name="android:fontFamily">@font/nanumsquareregular</item>
+    </style>
+
+    <!-- notification -->
+    <!-- button -->
+    <style name="notificationAbstractButton" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="colorControlHighlight">@color/signature_color_accent</item>
+        <item name="colorButtonNormal">@color/white</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="notificationButton" parent="notificationAbstractButton">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+    <!-- title text -->
+
+    <style name="floatingButton" >
+        <item name="backgroundTint">@color/signature_color_accent</item>
+        <item name="android:scaleType">center</item>
+
+    </style>
+<!-- android:layout_alignParentRight="true"
+            android:clickable="true"
+            app:cardCornerRadius="0dp" -->
+
+    <style name="clickableArea" parent="CardView">
+        <item name="cardBackgroundColor">@android:color/transparent</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+
+</resources>

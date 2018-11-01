@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <item
+        android:id="@+id/menu_play"
+        android:icon="@drawable/ic_play_arrow_black_24dp"
+        android:title="@string/play_this_folder"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
+</menu>

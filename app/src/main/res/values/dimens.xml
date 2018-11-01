@@ -1,0 +1,13 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+
+    <dimen name="md_keylines">16dp</dimen>
+    <!--
+         Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+         https://developer.android.com/design/patterns/navigation-drawer.html
+    -->
+    <dimen name="button_pressed_z_material">1dp</dimen>
+    <dimen name="button_elevation_material">1dp</dimen>
+    <dimen name="navheader_height">222dp</dimen>
+</resources>

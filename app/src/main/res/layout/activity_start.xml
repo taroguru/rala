@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="workshop.soso.jickjicke.ui.StartActivity">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/base_white">
+        <TextView
+            style="@style/StartActivityTitle"
+            android:layout_marginStart="48dp"
+            android:id="@+id/app_first"
+            android:textColor="@color/dark_grey"
+            android:text="R"
+            />
+
+        <TextView
+            style="@style/StartActivityTitle"
+            android:id="@+id/app_second"
+            android:layout_toRightOf="@id/app_first"
+            android:textColor="@color/dark_grey"
+            android:text="a"
+            />
+        <TextView
+            style="@style/StartActivityTitle"
+            android:id="@+id/app_third"
+            android:layout_toRightOf="@id/app_second"
+            android:textColor="@color/dark_grey"
+            android:text="l"
+            />
+        <TextView
+            style="@style/StartActivityTitle"
+            android:id="@+id/app_fourth"
+            android:layout_toRightOf="@id/app_third"
+            android:textColor="@color/dark_grey"
+            android:text="a"
+            />
+        <TextView
+            android:layout_marginTop="0dp"
+            android:id="@+id/underlinetext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/app_first"
+            android:textColor="@color/dark_grey"
+            android:text="             _____________________________"
+            android:maxLines="1"
+            style="@style/ItemTimeFont"
+            />
+        <!--
+        <ImageView
+            android:id="@+id/underline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="220dp"
+            app:srcCompat="@drawable/ic_border_color_black_24dp" />-->
+    </RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- android:background="@drawable/file_list_selector" -->
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    style="@style/HeaderItem">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mediastore_arrayitem_playlist"
+        android:padding="0dp" >
+        <TextView
+            android:id="@+id/txtIndex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:padding="0dp"
+            android:textSize="16sp"
+            android:color="@color/text_playitem"
+            android:text="1"
+            android:layout_centerVertical="true"
+            />
+        <ImageView
+            android:id="@+id/imgExpandToggle"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="16dp"
+            android:padding="0dp"
+            android:layout_centerVertical="true"
+            />
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="100dp"
+
+            android:padding="0dp"
+            android:textSize="16sp"
+            android:text="Part1 longlonglonglong"
+            android:ellipsize="end"
+            android:color="@color/text_playitem"
+            />
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="100dp"
+
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/txtName"
+            android:layout_alignParentRight="true"
+            android:padding="0dp"
+            android:textSize="10sp"
+            android:color="@color/button_grey"
+            android:text="123"
+            android:visibility="gone"
+
+            />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/imgPlayButtonClickArea"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="30dp"
+            android:layout_alignParentRight="true"
+            style="@style/clickableArea">
+
+            <RelativeLayout
+            android:layout_width="match_parent"
+                android:layout_height="match_parent"
+            >
+            <ImageView
+                android:id="@+id/imgPlayButton"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:padding="0dp"
+                app:srcCompat="@drawable/ic_play_arrow_black_24dp"
+                android:layout_centerVertical="true"
+                />
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/imgMoreButtonClickArea"
+            android:layout_width="31dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="0dp"
+            android:layout_alignParentRight="true"
+            style="@style/clickableArea">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <ImageView
+                    android:id="@+id/imgMoreButton"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_alignParentRight="true"
+                    android:padding="0dp"
+                    app:srcCompat="@drawable/ic_more_vert_black_24dp"
+                    android:layout_centerVertical="true"
+                    />
+            </RelativeLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
+    <!-- filename -->
+
