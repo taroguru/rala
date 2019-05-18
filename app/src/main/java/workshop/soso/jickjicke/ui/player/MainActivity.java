@@ -526,6 +526,7 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
         stateManager.launchAppFirstTime();
         //다른 화면으로 갔다온 경우 화면을 갱신해볼까
         vunglePub.onResume();
+        refreshScreen(stateManager.getCurrentPlayItem());    //현재 화면으로 돌아온 경우 화면 갱신함
         rescheduleTimerTask();
     }
 
@@ -646,25 +647,7 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
                         finishAffinity();
                     } else if (action.equals(ACTION.PlayNewItem)) {
                         PlayItem playItem = stateManager.getCurrentPlayItem();
-                        if (playItem != null) {
-
-//                            String strAlbumArtist = "";
-//                            String txtTime;
-//                            if (playItem.getAlbum() != null && !playItem.getAlbum().isEmpty()) {
-//                                strAlbumArtist = playItem.getAlbum();
-//                            }
-//                            if (playItem.getArtist() != null && !playItem.getArtist().isEmpty()) {
-//                                if (!strAlbumArtist.isEmpty()) {
-//                                    strAlbumArtist += " | ";
-//                                }
-//                                strAlbumArtist += playItem.getArtist();
-//                            }
-                            setTitle(playItem.getName());
-                            GUIHelper.setAlbumImage(getApplicationContext(), imgAlbum, playItem.getAudio().getAlbumid() );
-                            txtTime.setText(Utility.convertMsecToMin((int) playItem.getDuration()));
-                            refreshTimeLabel();
-
-                        }
+                        refreshScreen(playItem);
                     } else if (action.equals(ACTION.MainPageMove)) {
                         int pageNumber = intent.getIntExtra(EXTRA_VALUE.PageNumber, CONSTANTS.PAGE_PLAYER);
                         moveTab(pageNumber);
@@ -766,10 +749,17 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
         }
     }
 
+    private void refreshScreen(PlayItem playItem) {
+        if (playItem != null) {
+            setTitle(playItem.getName());
+            GUIHelper.setAlbumImage(getApplicationContext(), imgAlbum, playItem.getAudio().getAlbumid() );
+            txtTime.setText(Utility.convertMsecToMin((int) playItem.getDuration()));
+            refreshTimeLabel();
+        }
+    }
+
     public void refreshTimeLabel() {
         try {
-            PlayItem playItem = stateManager.getCurrentPlayItem();
-//            String txtTime = String.format("%s | %s", Utility.convertMsecToMin(onGetCurrentPosition()), Utility.convertMsecToMin((int) playItem.getDuration()));
             String txtTime = Utility.convertMsecToMin(onGetCurrentPosition());
             txtCurrentTime.setText(txtTime);
         } catch (NullPointerException e) {

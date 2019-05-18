@@ -232,6 +232,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCreate() {
+        Log.v(LOG_TAG, "onCreate");
         super.onCreate();
         initMembers();
         initNotification();
@@ -380,6 +381,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.v(LOG_TAG, "onStartCommand");
         String action = intent.getAction();
         DLog.v("onStartCommand : " + action);
 
@@ -683,7 +685,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-        DLog.v("Play it!");
+        DLog.v("onPrepared. Play it!");
         try {
             new Thread() {
                 @Override
@@ -1002,11 +1004,13 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.v(LOG_TAG, "onBind");
         return soundBind;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
+        Log.v(LOG_TAG, "onUnbind");
         try {
             mediaPlayer.stop();
             mediaPlayer.release();

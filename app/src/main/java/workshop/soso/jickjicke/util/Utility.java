@@ -473,7 +473,6 @@ public class Utility {
             options.inJustDecodeBounds = false;
 
 
-
             final Uri sArtworkUri = Uri
                     .parse("content://media/external/audio/albumart");
 
@@ -484,11 +483,13 @@ public class Utility {
 
             if (pfd != null) {
                 FileDescriptor fd = pfd.getFileDescriptor();
-                albumArtBitMap = ThumbnailUtils.extractThumbnail( BitmapFactory.decodeFileDescriptor(fd, null,
+                albumArtBitMap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFileDescriptor(fd, null,
                         options), CONSTANTS.THUMBNAIL_SIZE, CONSTANTS.THUMBNAIL_SIZE);
                 pfd = null;
                 fd = null;
             }
+        } catch (NullPointerException e){
+            DLog.v(LOG_TAG, album_id.toString() + "'s album art is not found.");
         } catch (Exception e) {
             e.printStackTrace();
         } catch (Error ee) {
