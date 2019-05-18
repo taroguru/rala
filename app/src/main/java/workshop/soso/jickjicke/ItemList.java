@@ -33,7 +33,8 @@ public class ItemList <T extends Item> extends ArrayItem{
     }
 
     public boolean addItem(T item) {
-        return itemlist.add(item);
+        if(itemlist != null) return itemlist.add(item);
+        return false;
     }
 
     public void removeAllItems() {
@@ -48,7 +49,11 @@ public class ItemList <T extends Item> extends ArrayItem{
         this.name = name;
     }
 
-    public int size(){return itemlist.size();}
+    public int size(){
+        int size = 0;
+        if(itemlist != null)    size = itemlist.size();
+        return size;
+    }
 
     public void clear() {
         if(itemlist != null)    itemlist.clear();

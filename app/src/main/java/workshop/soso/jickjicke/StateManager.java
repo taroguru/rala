@@ -39,6 +39,7 @@ public class StateManager extends Application implements Serializable {
     public static final String PREF_CURRENT_POSITION = "PREF_CURRENT_POSITION";
     public static final String PREF_LOOP = "PREF_LOOP";
     public static final String PREF_SPEED = "PREF_SPEED";
+    public static final String PREF_CREATE_NOTIFICATION_CHANNEL = "PREF_NOTIFICATION_CHANNEL";
 
     public static boolean DEBUG;   //현재  debug모드인지, release모드인지 확인.
     public static final int CurrentPlaylistPosition = 0;
@@ -289,6 +290,18 @@ public class StateManager extends Application implements Serializable {
         editor.putInt(PREF_LOOP, LoopState.toInteger(isLoop));
         editor.commit();
 
+    }
+
+    public boolean isCreateNotificationChannel(){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return sp.getBoolean(PREF_CREATE_NOTIFICATION_CHANNEL,false);
+    }
+
+    public void setCreateNotificationChannel(boolean isSet){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_CREATE_NOTIFICATION_CHANNEL, isSet);
+        editor.commit();
     }
 
     public float getSpeed() {

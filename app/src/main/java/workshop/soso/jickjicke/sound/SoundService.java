@@ -15,7 +15,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -79,52 +78,44 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MONITOR_STATE:
-                    monitorState();
+                    playbackToRepeatStart();
                     return;
             }
             super.handleMessage(msg);
         }
     }
 
-    private void monitorState() {
-        // 구간 반복 모드에서 다시 돌아가기.
-        StateManager stateManager = getStateManager(this);
-        PlayerState state = stateManager.getPlayerState();
+    //구간 반복 모드에서 시작점(A)로 다시 돌아가기.
+    private void playbackToRepeatStart() {
 
         try {
+            StateManager stateManager = getStateManager(this);
+            PlayerState state = stateManager.getPlayerState();
+
             if (state == PlayerState.AB_REPEAT &&
-                    stateManager.getAbRepeatList().getItemlist().size() != 0) {
+                stateManager.getAbRepeatList().size() != 0 &&
+                onGetPlayerState() == MediaPlayerStateMachine.State.STARTED &&
+                onIsNowPlaying()) {
 
-                if (onGetPlayerState() == MediaPlayerStateMachine.State.STARTED && onIsNowPlaying()) {
-                    if (state == PlayerState.AB_REPEAT) {
-                        int currentposition = getCurrentPosition();
-                        // repeat모드에서
-                        ABRepeat currentABRepeat = stateManager.getCurrentABRepeat();
+                ABRepeat currentABRepeat = stateManager.getCurrentABRepeat();
 
-                        if (currentABRepeat != null) {
-//                            DLog.v(LOG_TAG, String.format(
-//                                    "ABRepeatMode[%d:%d], current[%d]", currentABRepeat.getStart(),
-//                                    currentABRepeat.getEnd(), getCurrentPosition()));
-                            int endPosition = currentABRepeat.getEnd();
+                if (currentABRepeat != null) {
+                    int endPosition = currentABRepeat.getEnd();
+                    int currentPosition = getCurrentPosition();
 
-                            if (currentposition >= endPosition) {
-                                onSeekTo(currentABRepeat.getStart());
-                            } else {    //아직 구간의 끝까지 도착하지 않음.
-                                ;
-                            }
-                        }
-                    } else {    //abrepeat 모드가 아님
-                        ;
+                    if (currentPosition >= endPosition) {
+                        onSeekTo(currentABRepeat.getStart());
                     }
                 }
+
             }
         } catch (IllegalStateException e) {
             DLog.v("MediaPlayer is not playing");
             e.printStackTrace();
         } catch (NullPointerException e){
+            DLog.v("MediaPlayer has null");
             e.printStackTrace();
         }
-
     }
 
     private StateManager getStateManager(Context context) {
@@ -355,18 +346,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 } else if (action.equals(ACTION.PLAY_NEXT_PLAYITEM)) {
                     onNextTrack();
                 }
-                //                else if (action.equals(ACTION.PAUSE)) {
-//                    onPausePlayingMusic();
-//                }
-//                else if(action.equals(ACTION.EXIT))
-//                {
-//                    //clear notification
-//                    mNotificationManager.cancel(NOTIFICATION_PLAYER);
-////                    mNotificationManager.cancelAll();
-////                    onStopPlay();
-//                    //service stop
-////                    stopSelf();
-//                }
 
             }
         };
@@ -512,37 +491,51 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     private void initNotification() {
         DLog.v("init Notification View and Event");
-        //create notification compat
 
         DLog.v("init Notification View. set drawables to imagebutton");
         notificationView = new RemoteViews(getPackageName(), R.layout.notification_player_normal);
         changeNotiViewImage(R.id.buttonPrevPlayItem, R.drawable.ic_skip_previous_black_24dp, false);
         changeNotiViewImage(R.id.buttonPlay, R.drawable.ic_play_noti_24dp, false);
         changeNotiViewImage(R.id.buttonNextPlayItem, R.drawable.ic_skip_next_black_24dp, false);
-//        changeNotiViewImage(R.id.buttonExit, R.drawable.ic_close_black_24dp, false);
+
 
 
         DLog.v("init PendingIntent");
-        //button event mapping
         PendingIntent playPrevPlayItem = makePendingIntent(ACTION.PLAY_PREV_PLAYITEM);
-//        PendingIntent playPrevRepeat = makePendingIntent(ACTION.PLAY_PREV_REPEAT);
         PendingIntent playPlay = makePendingIntent(ACTION.PLAY);
-//        PendingIntent playNextRepeat = makePendingIntent(ACTION.PLAY_NEXT_REPEAT);
         PendingIntent playNextPlayItem = makePendingIntent(ACTION.PLAY_NEXT_PLAYITEM);
-//        PendingIntent intentExit = makePendingIntent(ACTION.EXIT);
-
 
         notificationView.setOnClickPendingIntent(R.id.buttonPrevPlayItem, playPrevPlayItem);
-//        notificationView.setOnClickPendingIntent(R.id.buttonPrevRepeat, playPrevRepeat);
         notificationView.setOnClickPendingIntent(R.id.buttonPlay, playPlay);
-//        notificationView.setOnClickPendingIntent(R.id.buttonNextRepeat, playNextRepeat);
         notificationView.setOnClickPendingIntent(R.id.buttonNextPlayItem, playNextPlayItem);
-//        notificationView.setOnClickPendingIntent(R.id.buttonExit, intentExit);
+//      notificationView.setOnClickPendingIntent(R.id.buttonExit, intentExit);  //종료버튼
 
         // Creates an explicit intent for an Activity in your app
         PendingIntent pendingIntent = makePendingIntent();
 
         DLog.v("Build Notification");
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //notification channel for oreo
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            StateManager stateManager = getStateManager(this);
+
+            if(!stateManager.isCreateNotificationChannel())
+            {
+                NotificationChannel notificationChannel = new NotificationChannel(CONSTANTS.NOTICHANNELID,getString(R.string.noti_player_name), NotificationManager.IMPORTANCE_LOW);
+                notificationChannel.setDescription(getString(R.string.channel_description));
+                notificationChannel.enableLights(false);
+                notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                notificationChannel.enableVibration(false);
+                notificationChannel.setSound(null, null);
+                notificationChannel.setShowBadge(false);
+
+                mNotificationManager.createNotificationChannel(notificationChannel);
+
+                stateManager.setCreateNotificationChannel(true);
+            }
+
+        }
+
         mBuilder =
                 new NotificationCompat.Builder(this, CONSTANTS.NOTICHANNELID)
 //                        .setSmallIcon(R.drawable.ic_repeat_white_24dp)
@@ -557,21 +550,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//            //todo. noti status bar의 아이콘이 vector image인 경우, kitkat 이하의 버전에서 에러 발생
-//            //smallicon이 없는 경우, lollipop 이상의 버전에서 에러 발생. 버전 로드 삽입.
+            //todo. noti status bar의 아이콘이 vector image인 경우, kitkat 이하의 버전에서 에러 발생
             mBuilder.setSmallIcon(R.drawable.ic_repeat_white_24dp);
-        }
-        // build and show notification
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        //noti channel for oreo
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel notificationChannel = new NotificationChannel(CONSTANTS.NOTICHANNELID,getString(R.string.noti_player_name), NotificationManager.IMPORTANCE_DEFAULT);
-            notificationChannel.setDescription(getString(R.string.channel_description));
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.BLUE);
-            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-
-            mNotificationManager.createNotificationChannel(notificationChannel);
         }
 
         mNotificationManager.notify(NOTIFICATION_PLAYER, mBuilder.build());
@@ -844,22 +824,20 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         StateManager.LoopState isLoop = stateManager.getLoop();
 
         int originIndex = currentIndex;
-        //재생할 트랙 계산.
+        currentIndex = calculatePrevIndex(currentIndex, nSoundFileCount);
+
+        showTrackInfo(currentIndex, nSoundFileCount, isLoop, originIndex);
+        return currentIndex;
+    }
+
+    private int calculatePrevIndex(int currentIndex, int nSoundFileCount) {
         if (currentIndex == StateManager.NO_PLAYABLE_TRACK || nSoundFileCount <= 0) {
             ShortTask.showSnack(this, R.string.play_list_is_empty);
         } else if (currentIndex == 0) {
-            //무조건 전체 반복모드로 가즈아!
-//            if (isLoop == StateManager.LoopState.LOOP_PLAYLIST)    //마지막 트랙으로 보냄
-//            {
             currentIndex = nSoundFileCount - 1;
-//            } else {
-//                ShortTask.showSnack(this, R.string.this_song_is_the_first_song);
-//            }
         } else {
             currentIndex--;
         }
-
-        showTrackInfo(currentIndex, nSoundFileCount, isLoop, originIndex);
         return currentIndex;
     }
 
@@ -867,7 +845,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         int currentIndex = getNextIndex();
         boolean result = false;
         StateManager stateManager = getStateManager(this);
-        //다음곡 플레
+
         if (currentIndex == StateManager.NO_PLAYABLE_TRACK) {
             ShortTask.showSnack(this, R.string.this_song_is_the_last_song);
         } else {
@@ -878,31 +856,24 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private int getNextIndex() {
-        int currentIndex;
         StateManager stateManager = getStateManager(this);
-        currentIndex = stateManager.getCurrentPosition();
-        int nSoundFileCount = stateManager.getCurrentPlayList().getItemlist().size();
+        int currentIndex = stateManager.getCurrentPosition();
+        int playlistLength = stateManager.getCurrentPlayList().getItemlist().size();
         StateManager.LoopState isLoop = stateManager.getLoop();
 
         int originIndex = currentIndex;
+        currentIndex = calculateNextIndex(currentIndex, playlistLength);
 
-        //재생할 트랙 계산.
-//        if(isLoop == StateManager.LoopState.LOOP_ONLY_ONE)
-//        {
-//            //아무것도 안함. 현재 트랙 한번 더 재생
-//        }
-//        else
-        if (currentIndex + 1 >= nSoundFileCount) {
-//            if (isLoop == StateManager.LoopState.LOOP_PLAYLIST) {
+        showTrackInfo(currentIndex, playlistLength, isLoop, originIndex);
+        return currentIndex;
+    }
+
+    private int calculateNextIndex(int currentIndex, int playlistLength) {
+        if (currentIndex + 1 >= playlistLength) {
             currentIndex = 0;   //첫곡으로.
-//            } else {
-//                currentIndex = StateManager.NO_PLAYABLE_TRACK;
-//            }
         } else {
             currentIndex++;
         }
-
-        showTrackInfo(currentIndex, nSoundFileCount, isLoop, originIndex);
         return currentIndex;
     }
 

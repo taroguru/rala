@@ -721,13 +721,13 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
                 buttonName = "ButtonRepeatMode";
                 break;
 
-            // 이전 구간 반복 점프
             case R.id.ButtonPreviousRepeat:
                 if (playSoundListener != null) {
                     playSoundListener.onPlayPreviousABRepeat();
                 }
                 buttonName = "ButtonPreviousRepeat";
                 break;
+
             case R.id.ButtonPlay:
                 if (playSoundListener != null) {
                     if (playSoundListener.onIsNowPlaying()) {
