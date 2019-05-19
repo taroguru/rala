@@ -46,6 +46,7 @@ public class CONSTANTS {
         return thisScreen;
     }
 
+    public static final int NOTIFICATIONID = 5252;
     public static final String NOTICHANNELID = "SoundServiceNotification";
     public static final int THUMBNAIL_SIZE = 150;
 

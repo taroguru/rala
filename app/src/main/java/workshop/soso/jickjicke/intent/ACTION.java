@@ -33,6 +33,7 @@ public class ACTION {
     public static final String RefreshCurrentPlaylist = "RefreshCurrentPlaylist";
     public static final String LoadCurrentPlaylistComplete = "LoadCurrentPlaylistComplete";
     public static final String PlayAudio = "PlayAudio";
+    public static final String StartSoundService = "StartSoundService";
 
 
     public static final String AddPlayList = "AddPlayList";

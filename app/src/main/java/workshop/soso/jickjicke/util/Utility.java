@@ -19,6 +19,7 @@ import android.view.View;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -488,7 +489,10 @@ public class Utility {
                 pfd = null;
                 fd = null;
             }
-        } catch (NullPointerException e){
+        } catch(FileNotFoundException e){
+            DLog.v(LOG_TAG, album_id.toString() + "'s album art image file is not found.");
+        }
+        catch (NullPointerException e){
             DLog.v(LOG_TAG, album_id.toString() + "'s album art is not found.");
         } catch (Exception e) {
             e.printStackTrace();

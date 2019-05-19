@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -189,12 +190,7 @@ public class MainActivity extends AppCompatActivity implements
         //member init
         initMember(savedInstanceState);
         initBroadCastReceiver();
-
-        if (!isSoundBound()) {//playIntent == null) {
-            DLog.v("bind service");
-            playIntent = new Intent(this, SoundService.class);
-            getApplicationContext().bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE);
-        }
+        initSoundService();
 
         //화면 갱신 시작
         if (msgHandler == null) {
@@ -204,6 +200,23 @@ public class MainActivity extends AppCompatActivity implements
 //        LoadAllPlayListTask loadTask = new LoadAllPlayListTask(this);
 //        loadTask.execute();
     }
+
+    private void initSoundService() {
+        Intent intent = new Intent(this, SoundService.class);
+        if (Build.VERSION.SDK_INT >= 26) {
+            startForegroundService(intent);
+        }
+        else {
+            startService(intent);
+        }
+
+        if (!isSoundBound()) {//playIntent == null) {
+            DLog.v("bind service");
+            playIntent = new Intent(this, SoundService.class);
+            bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
     private void initScreenState() {
         moveTab(CONSTANTS.PAGE_PLAYER);
 
@@ -636,12 +649,12 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
                     String action = intent.getAction();
                     DLog.v("MainActivity get an Intent : " + action);
                     if (action.equals(ACTION.RefreshScreen)) {
-                        //updateABRepeatDrawer();   //abrepeatnavigationfragment로 이동.
+
                     } else if (action.equals(ACTION.EXIT)) {
                         if (isSoundBound()) {
                             soundService.onStopPlay();
-                            stopService(new Intent(MainActivity.this, SoundService.class));
                             getApplicationContext().unbindService(soundConnection);
+                            stopService(new Intent(MainActivity.this, SoundService.class));
                             soundBound = false;
                         }
                         finishAffinity();
@@ -712,19 +725,6 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
-//                else if (action.equals(ACTION.PLAY)) {
-//                    try {
-//                        int drawId;
-//                        if (onIsNowPlaying()) {
-//                            drawId = R.drawable.ic_pause_black_24dp;
-//                        } else {
-//                            drawId = R.drawable.ic_play_arrow_black_24dp;
-//                        }
-//                        changeIcon(playButton, drawId);
-//                    } catch (NullPointerException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
             }
         };
     }
@@ -840,13 +840,6 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
     @Override
     protected void onDestroy() {
 
-//        if(soundBound)
-//        {
-//            getApplicationContext().unbindService(soundConnection);
-//            soundBound=false;
-//            playIntent=null;
-//        }
-
         super.onDestroy();
     }
 
@@ -917,9 +910,6 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if (id == android.R.id.home) {  //홈메뉴
@@ -930,61 +920,9 @@ public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYIT
             showAdvertisementDialog();
             return true;
         }
-        /**
-         *
-
-         else if (id == R.id.action_file_list) {
-         if (mPlayListNavigationDrawerFragment != null && mPlayListNavigationDrawerFragment.isDrawerOpen()) {
-         mDrawerLayout.closeDrawer(mPlayListNavigationDrawerFragment.getView());
-         } else {
-         mDrawerLayout.openDrawer(mPlayListNavigationDrawerFragment.getView());
-         }
-         return true;
-         }
-         */
 
         return super.onOptionsItemSelected(item);
     }
-
-//    public void showAddPlayItemActivity() {
-//        Intent intent = new Intent(this, AddPlayitemActivity.class);
-//        startActivityForResult(intent, REQ_CODE_ADD_PLAYITEM);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if(requestCode == REQ_CODE_ADD_PLAYITEM)
-//        {
-//            switch(resultCode)
-//            {
-//                case AddPlayitemActivity.RESULT_CODE_ADD_ITEM:
-//                {
-//                    Intent intent = getIntent();
-//                    int playlistIndex= intent.getIntExtra(ACTION.PlaylistPosition, 0);
-//                    int position = intent.getIntExtra(ACTION.Position, 0);
-//
-//                    updateFileListDrawer(playlistIndex, position);
-//                }
-//
-//                    break;
-//            }
-//        }
-//    }
-
-    //디버깅용메뉴
-//    @Override
-//    public void onABRepeatNavigationDrawerItemSelected(int position) {
-////        onPlaySoundListener.onMoveToABRepeat(position);
-//        playerFragment.onMoveToABRepeat(position);
-//    }
-//
-//    @Override
-//    public void onPlayListNavigationDrawerItemSelected(int position) {
-////        onPlaySoundListener.onPlaySoundTrack(position);
-//        playerFragment.onPlaySoundTrack(position);
-//    }
 
     @Override
     public boolean onPlaySoundTrack(int playOffset) {

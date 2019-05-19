@@ -235,10 +235,16 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         Log.v(LOG_TAG, "onCreate");
         super.onCreate();
         initMembers();
-        initNotification();
+        Notification notificationPlayer = initNotification();
         initLocalBroadcastReceiver();
         initListener();
         rescheduleTimerTask();
+
+        startForegroundService(notificationPlayer);
+    }
+
+    private void startForegroundService(Notification notificationPlayer) {
+        startForeground(CONSTANTS.NOTIFICATIONID, notificationPlayer);
     }
 
     //전화가 왔을 때 재생중이면 일시정지
@@ -293,7 +299,10 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 DLog.v("SoundService get an Intent : " + action);
-                if (action.equals(ACTION.PlayNewItem)) {
+                if(action.equals(ACTION.StartSoundService)){
+                    //
+                }
+                else if (action.equals(ACTION.PlayNewItem)) {
                     notifyPlayItemChanged();
                 } else if (action.equals(ACTION.PlayAudio)) {
                     int position = intent.getIntExtra(ACTION.Position, 0);
@@ -359,6 +368,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         intentFilter.addAction(ACTION.PLAY);
         intentFilter.addAction(ACTION.PLAY_NEXT_REPEAT);
         intentFilter.addAction(ACTION.PLAY_NEXT_PLAYITEM);
+        intentFilter.addAction(ACTION.StartSoundService);
 //        intentFilter.addAction(ACTION.EXIT);
         //intentFilter.addAction(ACTION.PAUSE);
 
@@ -381,9 +391,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.v(LOG_TAG, "onStartCommand");
         String action = intent.getAction();
-        DLog.v("onStartCommand : " + action);
+        DLog.v(LOG_TAG, "onStartCommand() : " + action);
 
         if (action.equals(ACTION.PLAY_PREV_PLAYITEM)) {
             onPrevTrack();
@@ -425,7 +434,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             DLog.v("unknown action : " + action);
         }
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     private void notifyPlayItemChanged() {
@@ -491,7 +500,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     NotificationCompat.Builder mBuilder;
     NotificationManager mNotificationManager;
 
-    private void initNotification() {
+    private Notification initNotification() {
         DLog.v("init Notification View and Event");
 
         DLog.v("init Notification View. set drawables to imagebutton");
@@ -555,8 +564,10 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             //todo. noti status bar의 아이콘이 vector image인 경우, kitkat 이하의 버전에서 에러 발생
             mBuilder.setSmallIcon(R.drawable.ic_repeat_white_24dp);
         }
+        Notification notificationPlayer = mBuilder.build();
+        mNotificationManager.notify(NOTIFICATION_PLAYER, notificationPlayer);
 
-        mNotificationManager.notify(NOTIFICATION_PLAYER, mBuilder.build());
+        return notificationPlayer;
 
     }
 
