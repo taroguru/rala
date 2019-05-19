@@ -1,5 +1,6 @@
 package workshop.soso.jickjicke.ui.player;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -201,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements
 //        loadTask.execute();
     }
 
+    @TargetApi(Build.VERSION_CODES.O)
     private void initSoundService() {
         Intent intent = new Intent(this, SoundService.class);
         if (Build.VERSION.SDK_INT >= 26) {
