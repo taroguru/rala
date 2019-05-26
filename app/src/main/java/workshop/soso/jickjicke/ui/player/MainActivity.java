@@ -198,8 +198,6 @@ public class MainActivity extends AppCompatActivity implements
             msgHandler = new MessageHandler();
         }
         initScreenState();
-//        LoadAllPlayListTask loadTask = new LoadAllPlayListTask(this);
-//        loadTask.execute();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -252,47 +250,36 @@ public class MainActivity extends AppCompatActivity implements
 
         createViewBottomPlayer();
 
-/*
-public static final String PLAY_PREV_PLAYITEM = PACKAGENAME + ".PLAY_PREV_PLAYITEM";
-    public static final String PLAY_PREV_REPEAT = PACKAGENAME + ".PLAY_PREV_REPEAT";
-    public static final String PLAY = PACKAGENAME + ".PLAY";
-    public static final String PAUSE = PACKAGENAME + ".PAUSE";
-    public static final String PLAY_NEXT_REPEAT = PACKAGENAME + ".PLAY_NEXT_REPEAT";
-    public static final String PLAY_NEXT_PLAYITEM = PACKAGENAME + ".PLAY_NEXT_PLAYITEM";
-
-
-* */
-
-
         mTitle = getTitle();    //어찌하리까? 타이틀을.
 
         // This method will trigger on item Click of navigation menu
-        navigationView.setNavigationItemSelectedListener(
-            menuItem -> {
-                try {
-                    DLog.d("DEBUG!", stateManager.toString());
+        navigationView.setNavigationItemSelectedListener(menuItem ->
+        {
 
-                    int id = menuItem.getItemId();
-                    switch (id) {
-                        case R.id.menu_go_to_developer:
-                            Utility.showDeveloperPage(getApplicationContext());
-                            break;
-                        case R.id.menu_go_to_google_play:
-                            Utility.showMarket(getApplicationContext());
-                            break;
+            try {
+                DLog.d("DEBUG!", stateManager.toString());
 
-                        case R.id.menu_show_advertise:
-                            vunglePub.playAd();
-                            break;
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.menu_go_to_developer:
+                        Utility.showDeveloperPage(getApplicationContext());
+                        break;
+                    case R.id.menu_go_to_google_play:
+                        Utility.showMarket(getApplicationContext());
+                        break;
 
-                    }
-                    // Closing drawer on item click
-                    mDrawerLayout.closeDrawers();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
+                    case R.id.menu_show_advertise:
+                        vunglePub.playAd();
+                        break;
+
                 }
-                return true;
-            });
+                // Closing drawer on item click
+                mDrawerLayout.closeDrawers();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            return true;
+        });
     }
 
 
