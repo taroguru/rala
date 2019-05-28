@@ -137,7 +137,7 @@
     </style>
 
     <style name="ItemTitleFont">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
         <item name="android:color">@color/text_playitem</item>

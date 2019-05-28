@@ -20,29 +20,30 @@
             android:color="@color/text_playitem"
             android:text="1"
             android:layout_centerVertical="true"
+            android:visibility="gone"
             />
         <ImageView
             android:id="@+id/imgExpandToggle"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="8dp"
             android:padding="0dp"
             android:layout_centerVertical="true"
             />
+
         <TextView
             android:id="@+id/txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="64dp"
-            android:layout_marginRight="100dp"
-
-            android:padding="0dp"
-            android:textSize="16dp"
-            android:text="Part1 longlonglonglong"
-            android:ellipsize="end"
+            android:layout_marginLeft="56dp"
+            android:layout_marginRight="60dp"
             android:color="@color/text_playitem"
-            />
+            android:ellipsize="end"
+            android:padding="0dp"
+            android:text="Part1 longl ong longl  ongPart1 Part1 longl ong longl  ongPart1 Part1 longl ong longl  ongPart1 Part1 longl ong longl  ongPart1 Part1 longl ong longl  ongPart1 "
+            android:maxLines="3"
+            android:textSize="16dp" />
         <TextView
             android:id="@+id/txtDescription"
             android:layout_width="match_parent"

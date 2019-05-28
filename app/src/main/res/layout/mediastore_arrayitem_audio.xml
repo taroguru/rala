@@ -29,7 +29,7 @@
             android:layout_marginRight="76dp"
             android:gravity="center_vertical"
             android:padding="0dp"
-            android:text="Title Title title titLe 12_34" />
+            android:text="Title Title title titLe 12_34Title Title title titLe 12_34Title Title title titLe 12_34" />
 
         <TextView
             android:id="@+id/txtArtist"

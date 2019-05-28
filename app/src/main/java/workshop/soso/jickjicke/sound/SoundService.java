@@ -386,7 +386,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
         }
 
-//        stopSelf();
+        stopSelf();
         super.onDestroy();
 
     }
