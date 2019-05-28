@@ -59,7 +59,6 @@ dependencies {
     api files("libs/dagger-2.7.jar")
     api files("libs/rxjava-1.2.0.jar")
     api files("libs/javax.inject-1.jar")
-    api files("libs/vungle-publisher-adaptive-id-4.1.0.jar")
     api files("libs/eventbus-2.2.1.jar")
     implementation  "androidx.appcompat:appcompat:${support_library_version}"
     implementation  "androidx.cardview:cardview:${support_library_version}"

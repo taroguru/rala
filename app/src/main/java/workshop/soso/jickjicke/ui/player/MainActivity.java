@@ -25,20 +25,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.google.android.material.bottomappbar.BottomAppBar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
-import com.vungle.publisher.VunglePub;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -51,6 +37,20 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import workshop.soso.jickjicke.CONSTANTS;
 import workshop.soso.jickjicke.PlayItem;
 import workshop.soso.jickjicke.R;
@@ -72,11 +72,8 @@ import workshop.soso.jickjicke.util.GUIHelper;
 import workshop.soso.jickjicke.util.ShortTask;
 import workshop.soso.jickjicke.util.Utility;
 
-//import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-//전체 컨테이너 액티비티.
 public class MainActivity extends AppCompatActivity implements
-//        ABRepeatFragment.NavigationDrawerCallbacks, PlayListFragment.NavigationDrawerCallbacks,
         OnPlaySoundListener, SearchView.OnQueryTextListener {
 
     public static final int REQ_CODE_ADD_PLAYITEM = 0;
@@ -91,9 +88,6 @@ public class MainActivity extends AppCompatActivity implements
     public static final String FRAGMENT_ID_FILELIST = "filelist";
     public static final String FRAGMENT_ID_MAIN = "main";
 
-
-    // VunglePub 인스턴스 보기
-    final VunglePub vunglePub = VunglePub.getInstance();
     private TabLayout tabs;
     private int onStartCount;
 
@@ -141,22 +135,19 @@ public class MainActivity extends AppCompatActivity implements
     //service
     private SoundService soundService = null;
     private Intent playIntent = null;
-    private boolean soundBound = false; //?
+    private boolean soundServiceBound = false; //?
 
     private ServiceConnection soundConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             SoundService.SoundBinder binder = (SoundService.SoundBinder) service;
-
             soundService = binder.getService();
 
-            soundBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             soundService = null;
-            soundBound = false;
         }
     };
 
@@ -202,19 +193,30 @@ public class MainActivity extends AppCompatActivity implements
 
     @TargetApi(Build.VERSION_CODES.O)
     private void initSoundService() {
-        Intent intent = new Intent(this, SoundService.class);
-        if (Build.VERSION.SDK_INT >= 26) {
-            startForegroundService(intent);
+
+        Intent startServiceIntent = new Intent(getApplicationContext(), SoundService.class);
+        startServiceIntent.setAction(ACTION.StartSoundService);
+        ComponentName startService;
+        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startService = startForegroundService(startServiceIntent);
         }
         else {
-            startService(intent);
+            startService = startService(startServiceIntent);
         }
 
-        if (!isSoundBound()) {//playIntent == null) {
-            DLog.v("bind service");
-            playIntent = new Intent(this, SoundService.class);
-            bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE);
+        if (startService != null && !isSoundServiceBound()) {
+            bindSoundService();
         }
+    }
+
+    private boolean bindSoundService() {
+        DLog.v("bind service");
+        playIntent = new Intent(MainActivity.this, SoundService.class);
+
+        if(bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE))
+            soundServiceBound = true;
+
+        return soundServiceBound;
     }
 
     private void initScreenState() {
@@ -269,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements
                         break;
 
                     case R.id.menu_show_advertise:
-                        vunglePub.playAd();
+                        ShortTask.showToast(this, "No Ads");
                         break;
 
                 }
@@ -321,21 +323,17 @@ public class MainActivity extends AppCompatActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.exit_app)).setView(mainView).
                 setNeutralButton(R.string.show_advertise, (dialog, which) -> {
-                    if (vunglePub.isAdPlayable()) {
-                        vunglePub.playAd();
-                    } else {
-                        ShortTask.showSnack(getBaseContext(), getString(R.string.wait_load_adv));
-                    }
+
                 }).setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //개발자 페이지로
-                Utility.sendIntentLocalBroadcast(getParent(), ACTION.EXIT);
-            }
-        }).setNegativeButton(R.string.go_to_google_play, (dialog, which) -> {
-            //닫기
-            Utility.showMarket(getBaseContext());
-            //dialog.dismiss();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //종료
+                        Utility.sendIntentLocalBroadcast(getParent(), ACTION.EXIT);
+                    }
+                }).setNegativeButton(R.string.go_to_google_play, (dialog, which) -> {
+                    //구글 마켓으로
+                    Utility.showMarket(getBaseContext());
+                    //dialog.dismiss();
         });
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -484,30 +482,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPlayPreviousABRepeat() {
-        if (isSoundBound()) {
-            soundService.playPreviousABRepeat();
-        }
-    }
-
-    @Override
-    public void onPlayNextABRepeat() {
-        if (isSoundBound()) {
-            soundService.onPlayNextABRepeat();
-        }
-    }
-
-    @Override
-    public void onChangeLoopMode(boolean isLoop) {
-        if (isSoundBound()) {
-            soundService.onChangeLoopMode(isLoop);
-        }
-    }
-
-    @Override
     public MediaPlayerStateMachine.State onGetPlayerState() {
         MediaPlayerStateMachine.State state = null;
-        if (isSoundBound()) {
+        if (isUsableSoundService()) {
             state = soundService.onGetPlayerState();
         }
         return state;
@@ -516,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public int onGetDuration() {
         int duration = -1;
-        if (isSoundBound()) {
+        if (isUsableSoundService()) {
             duration = soundService.getDuration();
         }
         return duration;
@@ -526,8 +503,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         stateManager.launchAppFirstTime();
-        //다른 화면으로 갔다온 경우 화면을 갱신해볼까
-        vunglePub.onResume();
         refreshScreen(stateManager.getCurrentPlayItem());    //현재 화면으로 돌아온 경우 화면 갱신함
         rescheduleTimerTask();
     }
@@ -550,7 +525,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         try {
-            vunglePub.onPause();
             //ui thread
             refreshTimer.cancel();
             refreshTimer.purge();
@@ -560,49 +534,92 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onResumePausedMusic() {
-        if (soundBound) {
-            soundService.onResumePausedMusic();
+    private class SoundCommand{
+
+        CommandBody commandBody;
+
+        SoundCommand(CommandBody runCommand){
+            commandBody = runCommand;
         }
+
+        public boolean execute() {
+            boolean result = false;
+            SoundService service = getSoundService();
+            if (service != null) {
+                result = commandBody.run(service);
+            }
+            return result;
+        }
+
     }
 
+    @FunctionalInterface
+    public interface CommandBody{
+        boolean run(SoundService service);
+    }
+
+    @FunctionalInterface
+    public interface CommandBodyInteger{
+        int run(SoundService service);
+    }
 
     @Override
     public boolean onNextTrack() {
-        boolean result = false;
-        if (isSoundBound()) {
-            result = soundService.playNextTrack();
-        }
-        return result;
+        return new SoundCommand((service)->{ return service.onNextTrack(); }).execute();
     }
 
     @Override
-    public void onStopPlay() {
-        if (isSoundBound()) {
-            soundService.stop();
-        }
+    public boolean onStopPlay() {
+        return new SoundCommand((service)->{ return service.onStopPlay(); }).execute();
     }
 
     @Override
-    public void onSeekTo(int position) {
-        if (isSoundBound()) {
-            soundService.seekTo(position);
-        }
+    public boolean onSeekTo(int position) {
+        return new SoundCommand((service)->{ return service.onSeekTo(position); }).execute();
     }
 
     @Override
-    public void onPlayABRepeat(int position) {
-        if (isSoundBound()) {
-            soundService.playABRepeat(position);
+    public boolean onPlayABRepeat(int position) {
+        return new SoundCommand((service)->{ return service.onPlayABRepeat(position); }).execute();
+    }
+
+    @Override
+    public boolean onResumePausedMusic() {
+        return new SoundCommand((service)->{ return service.onResumePausedMusic(); }).execute();
+    }
+
+    @Override
+    public boolean onPrevTrack() {
+        return new SoundCommand((service)->{ return service.onPrevTrack(); }).execute();
+    }
+
+    @Override
+    public boolean onPlayPreviousABRepeat() {
+        return new SoundCommand((service)->{ return service.onPlayPreviousABRepeat(); }).execute();
+    }
+
+    @Override
+    public boolean onPlayNextABRepeat() {
+        return new SoundCommand((service)->{ return service.onPlayNextABRepeat(); }).execute();
+    }
+
+    @Override
+    public void onChangeLoopMode(boolean isLoop) {
+        if (isUsableSoundService()) {
+            soundService.onChangeLoopMode(isLoop);
         }
     }
 
     @Override
     public int onGetCurrentPosition() {
         int position = -1;
-        if (isSoundBound()) {
-            position = soundService.getCurrentPosition();
+//        new SoundCommand((service)->{
+//            position = service.getCurrentPosition();
+//            return true;
+//        }).execute();
+
+        if(isUsableSoundService()){
+            position = soundService.onGetCurrentPosition();
         }
         return position;
     }
@@ -610,24 +627,24 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onIsNowPlaying() {
         boolean result = false;
-        if (isSoundBound()) {
+        if (isSoundServiceBound()) {
             result = soundService.isNowPlaying();
         }
 
         return result;
     }
 
-    private boolean isSoundBound() {
-        return soundBound && (soundService != null);
+    private boolean isSoundServiceBound() {
+        return soundServiceBound;
     }
 
-    @Override
-    public boolean onPrevTrack() {
-        boolean result = false;
-        if (isSoundBound()) {
-            result = soundService.playPrevTrack();
-        }
-        return result;
+    private boolean isUsableSoundService(){
+        return soundService != null;
+    }
+
+    private SoundService getSoundService() {
+        if(!isUsableSoundService()) bindSoundService();
+        return soundService;
     }
 
     private void initBroadCastReceiver() {
@@ -640,12 +657,9 @@ public class MainActivity extends AppCompatActivity implements
                     if (action.equals(ACTION.RefreshScreen)) {
 
                     } else if (action.equals(ACTION.EXIT)) {
-                        if (isSoundBound()) {
-                            soundService.onStopPlay();
-                            getApplicationContext().unbindService(soundConnection);
-                            stopService(new Intent(MainActivity.this, SoundService.class));
-                            soundBound = false;
-                        }
+                        soundService.onStopPlay();
+                        unbindSoundService();
+                        stopService(new Intent(MainActivity.this, SoundService.class));
                         finishAffinity();
                     } else if (action.equals(ACTION.PlayNewItem)) {
                         PlayItem playItem = stateManager.getCurrentPlayItem();
@@ -658,25 +672,27 @@ public class MainActivity extends AppCompatActivity implements
                         if (!message.isEmpty()) {
                             Snackbar snackbar = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
 
-                            View snackbarView = snackbar.getView();
-                            CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)snackbarView.getLayoutParams();
+                            //parameter로 둘까? toast하단을 띄워서 표시할 때 사용하자.
+                            if(false) {
+                                View snackbarView = snackbar.getView();
+                                CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) snackbarView.getLayoutParams();
 
-                            int marginSide = 0;
-                            int marginBottom = 0;
+                                int marginSide = 0;
+                                int marginBottom = 0;
 
-                            if(bottomToolBar.getVisibility() != View.GONE)
-                            {
-                                marginBottom = bottomToolBar.getHeight();
+                                if (bottomToolBar.getVisibility() != View.GONE) {
+                                    marginBottom = bottomToolBar.getHeight();
+                                }
+
+                                params.setMargins(
+                                        params.leftMargin + marginSide,
+                                        params.topMargin,
+                                        params.rightMargin + marginSide,
+                                        params.bottomMargin + marginBottom
+                                );
+
+                                snackbarView.setLayoutParams(params);
                             }
-
-                            params.setMargins(
-                                    params.leftMargin + marginSide,
-                                    params.topMargin,
-                                    params.rightMargin + marginSide,
-                                    params.bottomMargin + marginBottom
-                            );
-
-                            snackbarView.setLayoutParams(params);
                             snackbar.show();
 
                         }
@@ -783,13 +799,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        initAdvertisement();
-    }
-
-    private void initAdvertisement() {
-        final String app_id = "59578be9fcb6404a4b00082d";
-        if (!vunglePub.isAdPlayable())
-            vunglePub.init(this, app_id);
     }
 
     //최초 실행시점에서 soundservice가 널 일때만 생성.
@@ -828,11 +837,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
+        if(isSoundServiceBound()){
+            unbindSoundService();
+        }
+
 
         super.onDestroy();
     }
 
-
+    private void unbindSoundService(){
+        if (isSoundServiceBound()) {
+            unbindService(soundConnection);
+            soundServiceBound = false;
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);

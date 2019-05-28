@@ -28,7 +28,7 @@ public interface OnPlaySoundListener {
      * onmovetoabrepeat과 동일. duplicated source
      * @param position
      */
-    void onPlayABRepeat(int position);
+    boolean onPlayABRepeat(int position);
 
     /**
      * 일지중지
@@ -48,13 +48,13 @@ public interface OnPlaySoundListener {
     /**
      * 재생 중지
      */
-    void onStopPlay();
+    boolean onStopPlay();
 
     /**
      * 현재 플레이 중인 파일의 특정 위치로 이동
      * @param position 특정 위치. millisecound(ms) 단위.
      */
-    void onSeekTo(int position);
+    boolean onSeekTo(int position);
 
     /**
      * 현재 재생 중인 위치 반환
@@ -71,7 +71,7 @@ public interface OnPlaySoundListener {
     /**
      * 일시 중지된 아이템 재생
      */
-    void onResumePausedMusic();
+    boolean onResumePausedMusic();
 
     /**
      * 재생 중인 아이템 길이 반환
@@ -82,12 +82,12 @@ public interface OnPlaySoundListener {
     /**
      * 이전 반복구간 재생
      */
-    void onPlayPreviousABRepeat();
+    boolean onPlayPreviousABRepeat();
 
     /**
      * 다음 반복구간 재생
      */
-    void onPlayNextABRepeat();
+    boolean onPlayNextABRepeat();
     /*
     한곡 반복 모드 설정
     */

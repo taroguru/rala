@@ -30,16 +30,17 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import androidx.appcompat.widget.AppCompatDrawableManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.appcompat.widget.AppCompatDrawableManager;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import workshop.soso.jickjicke.ABRepeat;
 import workshop.soso.jickjicke.CONSTANTS;
 import workshop.soso.jickjicke.PlayItem;
@@ -153,13 +154,13 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void onStopPlay() {
-        stop();
+    public boolean onStopPlay() {
+        return stop();
     }
 
     @Override
-    public void onPlayABRepeat(int position) {
-        playABRepeat(position);
+    public boolean onPlayABRepeat(int position) {
+        return playABRepeat(position);
     }
 
     @Override
@@ -183,8 +184,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void onResumePausedMusic() {
-        resume();
+    public boolean onResumePausedMusic() {
+        return resume();
     }
 
     @Override
@@ -193,13 +194,13 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void onPlayPreviousABRepeat() {
-        playPreviousABRepeat();
+    public boolean onPlayPreviousABRepeat() {
+        return playPreviousABRepeat();
     }
 
     @Override
-    public void onPlayNextABRepeat() {
-        playNextABRepeat();
+    public boolean onPlayNextABRepeat() {
+        return playNextABRepeat();
     }
 
     @Override
@@ -219,8 +220,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void onSeekTo(int position) {
-        seekTo(position);
+    public boolean onSeekTo(int position) {
+        return seekTo(position);
     }
 
     public class SoundBinder extends Binder {
@@ -235,15 +236,16 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         Log.v(LOG_TAG, "onCreate");
         super.onCreate();
         initMembers();
-        Notification notificationPlayer = initNotification();
+
         initLocalBroadcastReceiver();
         initListener();
         rescheduleTimerTask();
 
-        startForegroundService(notificationPlayer);
+
     }
 
-    private void startForegroundService(Notification notificationPlayer) {
+    private void startForegroundService() {
+        Notification notificationPlayer = initNotification();
         startForeground(CONSTANTS.NOTIFICATIONID, notificationPlayer);
     }
 
@@ -394,7 +396,15 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         String action = intent.getAction();
         DLog.v(LOG_TAG, "onStartCommand() : " + action);
 
-        if (action.equals(ACTION.PLAY_PREV_PLAYITEM)) {
+        if(action == null || action.isEmpty())
+        {
+            DLog.v("Empty Action.");
+        }
+        else if(action.equals(ACTION.StartSoundService)){
+            DLog.v("Start Foreground Service");
+            startForegroundService();
+        }
+        else if (action.equals(ACTION.PLAY_PREV_PLAYITEM)) {
             onPrevTrack();
         } else if (action.equals(ACTION.PLAY_PREV_REPEAT)) {
             DLog.v("play prev repeat. from notification");
@@ -565,7 +575,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             mBuilder.setSmallIcon(R.drawable.ic_repeat_white_24dp);
         }
         Notification notificationPlayer = mBuilder.build();
-        mNotificationManager.notify(NOTIFICATION_PLAYER, notificationPlayer);
+        //mNotificationManager.notify(NOTIFICATION_PLAYER, notificationPlayer);
 
         return notificationPlayer;
 
@@ -719,16 +729,16 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         return result;
     }
 
-    public int stop() {
-        int result = 1;
+    public boolean stop() {
+        boolean result = false;
 
         if (mediaPlayer != null) {
             try {
                 mediaPlayer.stop();
+                result = true;
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
-
         }
 
         return result;
@@ -749,7 +759,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         return nowPlaying;
     }
 
-    public void seekTo(int afterPosition) {
+    public boolean seekTo(int afterPosition) {
+        boolean result = false;
         try {
             StateManager stateManager = getStateManager(this);
             if (stateManager.getPlayerState() == PlayerState.AB_REPEAT) {
@@ -762,11 +773,14 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 }
             }
             mediaPlayer.seekTo(afterPosition);
+            result = true;
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+
+        return result;
 
     }
 
@@ -897,7 +911,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
 
-    public void playPreviousABRepeat() {
+    public boolean playPreviousABRepeat() {
+        boolean result = false;
         try {
             StateManager stateManager = getStateManager(this);
             ArrayList<ABRepeat> abrepeatList = stateManager.getAbRepeatList().getItemlist();
@@ -922,26 +937,32 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             } else {
                 ShortTask.showSnack(this, R.string.abrepeatlist_is_empty);
             }
+            result = true;
         } catch (IllegalStateException e) {
             DLog.e("Cannot get current position in current state." + mediaPlayer.getState());
             e.printStackTrace();
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
+        return result;
     }
 
-    public void playABRepeat(int position) {
+    public boolean playABRepeat(int position) {
+        boolean result = false;
         try{
             StateManager stateManager = getStateManager(this);
             stateManager.setCurrentABRepeatPosition(position);
             seekTo(stateManager.getCurrentABRepeat().getStart());
+            result = true;
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+        return result;
     }
 
-    public void playNextABRepeat() {
+    public boolean playNextABRepeat() {
+        boolean result = false;
+
         try {
             StateManager stateManager = getStateManager(this);
             ArrayList<ABRepeat> abrepeatList = stateManager.getAbRepeatList().getItemlist();
@@ -967,6 +988,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             } else {
                 ShortTask.showSnack(this, R.string.abrepeatlist_is_empty);
             }
+
+            result = true;
         } catch (IllegalStateException e) {
             DLog.e("Cannot get current position in current state." + mediaPlayer.getState());
             e.printStackTrace();
@@ -974,6 +997,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             e.printStackTrace();
         }
 
+        return result;
     }
 
     /**
@@ -1002,15 +1026,19 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         }
     }
 
-    public void resume() {
+    public boolean resume() {
+        boolean result = false;
         Log.v(LOG_TAG, "resume player");
         try {
             mediaPlayer.start();
+            result = true;
         } catch (IllegalStateException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
             e.printStackTrace();
         }
+
+        return result;
     }
 
     @Override
@@ -1022,13 +1050,21 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     @Override
     public boolean onUnbind(Intent intent) {
         Log.v(LOG_TAG, "onUnbind");
-        try {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        }
+        //unbind타이밍에 stop을 하면 안된다. MainActivity의 onDestroy타이밍에 unbind를 거는데,
+        //백그라운드에서 나와야 할 소리가 멈춤.
+//        try {
+
+//            mediaPlayer.stop();
+//            mediaPlayer.release();
+//        } catch (IllegalStateException e) {
+//            e.printStackTrace();
+//        }
         return false;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
     }
 
     @Override
