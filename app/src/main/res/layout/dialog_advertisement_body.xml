@@ -18,7 +18,7 @@
         android:layout_below="@+id/imagePart"
         android:gravity="center"
         android:layout_margin="16dp"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:text="@string/thank_you_for_using_this_app_do_you_want_to_exit_app"
         style="@style/PlayerButton"/>
     </RelativeLayout>
