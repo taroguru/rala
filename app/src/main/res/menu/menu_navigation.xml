@@ -26,12 +26,5 @@
             android:tint="@color/button_grey"
             android:title="@string/go_to_google_play" />
 
-        <item
-            android:id="@+id/menu_show_advertise"
-            android:icon="@drawable/ic_play_circle_filled_black_48dp"
-            android:tint="@color/button_grey"
-            android:title="@string/show_advertise" />
-
-
     </group>
 </menu>

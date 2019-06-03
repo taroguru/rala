@@ -16,6 +16,10 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -26,9 +30,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.RecyclerView;
 import workshop.soso.jickjicke.ABRepeatList;
 import workshop.soso.jickjicke.CONSTANTS;
 import workshop.soso.jickjicke.ItemList;
@@ -552,7 +553,10 @@ public class Utility {
 
     public static void showDeveloperPage(Context activity)
     {
-        activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.naver.com/ateliersoso/221093575334" )));
+        //FLAG_ACTIVITY_NEW_TASK
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.naver.com/ateliersoso/221093575334" ));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
     }
 
     public static boolean hasPermission(Context context, String permissionName)

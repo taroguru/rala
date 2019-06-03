@@ -24,7 +24,6 @@
     <string name="playitem_is_removed">\u0022#_#_#\u0022 삭제</string>
     <string name="has_no_playlist">파일을 추가할 플레이리스트가 없어요</string>
     <string name="go_to_google_play">마켓으로</string>
-    <string name="show_advertise">광고보기</string>
     <string name="go_to_developer">개발자 페이지로</string>
     <string name="file_is_nothing_or_broken">삭제되었거나 재생할 수 없는 파일입니다</string>
     <string name="exit_app">앱 종료</string>

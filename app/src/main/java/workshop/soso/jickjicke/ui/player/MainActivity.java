@@ -69,7 +69,6 @@ import workshop.soso.jickjicke.ui.player.drawer.ABRepeatFragment;
 import workshop.soso.jickjicke.ui.util.OnFloatingButtonStyleChange;
 import workshop.soso.jickjicke.util.DLog;
 import workshop.soso.jickjicke.util.GUIHelper;
-import workshop.soso.jickjicke.util.ShortTask;
 import workshop.soso.jickjicke.util.Utility;
 
 
@@ -270,10 +269,6 @@ public class MainActivity extends AppCompatActivity implements
                         Utility.showMarket(getApplicationContext());
                         break;
 
-                    case R.id.menu_show_advertise:
-                        ShortTask.showToast(this, "No Ads");
-                        break;
-
                 }
                 // Closing drawer on item click
                 mDrawerLayout.closeDrawers();
@@ -320,9 +315,7 @@ public class MainActivity extends AppCompatActivity implements
         RelativeLayout mainView = (RelativeLayout) inflater.inflate(R.layout.dialog_advertisement_body, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.exit_app)).setView(mainView).
-                setNeutralButton(R.string.show_advertise, (dialog, which) -> {
-
-                }).setPositiveButton(R.string.exit, (dialog, which) -> {
+                setPositiveButton(R.string.exit, (dialog, which) -> {
                     //종료
                     Utility.sendIntentLocalBroadcast(getParent(), ACTION.EXIT);
                 }).setNegativeButton(R.string.go_to_google_play, (dialog, which) -> {

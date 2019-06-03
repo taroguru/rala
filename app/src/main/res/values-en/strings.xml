@@ -24,7 +24,6 @@
     <string name="playitem_is_removed">\u0022#_#_#\u0022 Deleted</string>
     <string name="has_no_playlist">There is no playlist to add a music</string>
     <string name="go_to_google_play">Rating and Comments</string>
-    <string name="show_advertise">Advertisement</string>
     <string name="go_to_developer">Developer\'s Homepage</string>
     <string name="file_is_nothing_or_broken">Removed or corrupted music</string>
     <string name="exit_app">Exit</string>
