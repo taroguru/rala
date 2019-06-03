@@ -25,7 +25,7 @@
                 android:layout_height="?android:attr/actionBarSize"
                 app:layout_scrollFlags="enterAlwaysCollapsed"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/MainToolBar" />
+                android:theme="@style/MainToolBar" />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"

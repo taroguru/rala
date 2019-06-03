@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -60,7 +58,9 @@ import workshop.soso.jickjicke.intent.EXTRA_VALUE;
 import workshop.soso.jickjicke.sound.MediaPlayerStateMachine;
 import workshop.soso.jickjicke.sound.OnPlaySoundListener;
 import workshop.soso.jickjicke.sound.SoundService;
+import workshop.soso.jickjicke.ui.MarqueeToolbar;
 import workshop.soso.jickjicke.ui.currentlist.CurrentPlayItemFragment;
+import workshop.soso.jickjicke.ui.mediastore.AbstractMediaArrayAdapter;
 import workshop.soso.jickjicke.ui.mediastore.MediaStoreFragment;
 import workshop.soso.jickjicke.ui.mediastore.audio.AudioListFragment;
 import workshop.soso.jickjicke.ui.mediastore.folder.MediastoreFragmentByFolder;
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final int REQ_CODE_ADD_PLAYITEM = 0;
     private static final String KEY_STATEMANAGER = "KEY_STATEMANAGER";
+    private static final String KEY_SERVICE_BIND = "KEY_SERVICE_BIND";
 
     private Adapter adapter;
     private BroadcastReceiver broadcastReceiver;
@@ -137,12 +138,15 @@ public class MainActivity extends AppCompatActivity implements
     private Intent playIntent = null;
     private boolean soundServiceBound = false; //?
 
+    public FloatingActionButton getFloatingButton(){
+        return floatAddButton;
+    }
     private ServiceConnection soundConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             SoundService.SoundBinder binder = (SoundService.SoundBinder) service;
             soundService = binder.getService();
-
+            Utility.sendIntentLocalBroadcast(getApplicationContext(), ACTION.RefreshScreen);
         }
 
         @Override
@@ -160,20 +164,22 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
         outState.putSerializable(KEY_STATEMANAGER, stateManager);
-
+        outState.putBoolean(KEY_SERVICE_BIND, isSoundServiceBound());
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
+        stateManager =  (StateManager) savedInstanceState.getSerializable(KEY_STATEMANAGER);
+        soundServiceBound = savedInstanceState.getBoolean(KEY_SERVICE_BIND);
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DLog.d(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         initEnterAnimation(savedInstanceState);
@@ -182,38 +188,37 @@ public class MainActivity extends AppCompatActivity implements
         //member init
         initMember(savedInstanceState);
         initBroadCastReceiver();
-        initSoundService();
 
-        //화면 갱신 시작
-        if (msgHandler == null) {
-            msgHandler = new MessageHandler();
-        }
-        initScreenState();
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private void initSoundService() {
+    private void initSoundService(Bundle savedInstanceState) {
+        DLog.d("initSoundService");
+        if(isSoundServiceBound()){
 
-        Intent startServiceIntent = new Intent(getApplicationContext(), SoundService.class);
-        startServiceIntent.setAction(ACTION.StartSoundService);
-        ComponentName startService;
-        if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startService = startForegroundService(startServiceIntent);
-        }
-        else {
-            startService = startService(startServiceIntent);
-        }
+        } else
+        {
+            Intent startServiceIntent = new Intent(getApplicationContext(), SoundService.class);
+            startServiceIntent.setAction(ACTION.StartSoundService);
 
-        if (startService != null && !isSoundServiceBound()) {
+            DLog.d("startSoundService");
+            if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(startServiceIntent);
+            }
+            else {
+                startService(startServiceIntent);
+            }
+
             bindSoundService();
+
         }
     }
 
     private boolean bindSoundService() {
-        DLog.v("bind service");
+        DLog.d("bindSoundService");
         playIntent = new Intent(MainActivity.this, SoundService.class);
 
-        if(bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE))
+        if( getApplicationContext().bindService(playIntent, soundConnection, Context.BIND_AUTO_CREATE))
             soundServiceBound = true;
 
         return soundServiceBound;
@@ -221,18 +226,15 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initScreenState() {
         moveTab(CONSTANTS.PAGE_PLAYER);
-
     }
 
     private void createView() {
         setContentView(R.layout.activity_main);
         coordinatorLayout = findViewById(R.id.main_content);
         //메인 스크린의 툴바 설치.
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        MarqueeToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         bottomToolBar = findViewById(R.id.bottomPlayerAppBar);
-        //setSupportActionBar(toolbar);
-
 
         //viewpager 메인 설정
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -243,13 +245,11 @@ public class MainActivity extends AppCompatActivity implements
         tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
 
-
         //네비게이션 드로우어(좌측 메뉴) 생성
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         //하단 player 생성
-
         createViewBottomPlayer();
 
         mTitle = getTitle();    //어찌하리까? 타이틀을.
@@ -282,10 +282,8 @@ public class MainActivity extends AppCompatActivity implements
             }
             return true;
         });
+
     }
-
-
-//    private boolean isBottomPlayerView = false;
 
     private void createViewBottomPlayer() {
         bottomPlayerView = findViewById(R.id.bottomPlayerRelativeLayout);
@@ -324,12 +322,9 @@ public class MainActivity extends AppCompatActivity implements
         builder.setTitle(getString(R.string.exit_app)).setView(mainView).
                 setNeutralButton(R.string.show_advertise, (dialog, which) -> {
 
-                }).setPositiveButton(R.string.exit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //종료
-                        Utility.sendIntentLocalBroadcast(getParent(), ACTION.EXIT);
-                    }
+                }).setPositiveButton(R.string.exit, (dialog, which) -> {
+                    //종료
+                    Utility.sendIntentLocalBroadcast(getParent(), ACTION.EXIT);
                 }).setNegativeButton(R.string.go_to_google_play, (dialog, which) -> {
                     //구글 마켓으로
                     Utility.showMarket(getBaseContext());
@@ -392,27 +387,20 @@ public class MainActivity extends AppCompatActivity implements
 
         try {
             //floating button
-            adapter.changeFloatingButton(position);
+            if(adapter != null)  adapter.changeFloatingButton(position);
 
             //bottom bar
-            if (position == CONSTANTS.PAGE_PLAYER) {
-                bottomToolBar.setVisibility(View.GONE);
-            } else {
-                bottomToolBar.setVisibility(View.VISIBLE);
+            if(bottomToolBar != null) {
+                if (position == CONSTANTS.PAGE_PLAYER) {
+                    bottomToolBar.setVisibility(View.GONE);
+                } else {
+                    bottomToolBar.setVisibility(View.VISIBLE);
+                }
             }
 
             //searchview
-            if ((position == CONSTANTS.PAGE_ABREPEATLIST) || (position == CONSTANTS.PAGE_PLAYER)) {
-                searchView.setVisibility(View.GONE);
-            }else{
-//            } else if ((position == CONSTANTS.PAGE_CURRENT_PLAYLIST) ||
-//                    (position == CONSTANTS.PAGE_FOLDER_LIST) ||
-//                    (position == CONSTANTS.PAGE_ALL_AUDIO_LIST) ||
-//                    (position == CONSTANTS.PAGE_PLAYLIST)) {
-                //다른 목록으로 넘어가면 검색 취소
-                searchView.setIconified(true);
-                searchView.setIconified(true);
-                searchView.setVisibility(View.VISIBLE);
+            if(searchView != null){
+                changeSearchView(position);
             }
 
             Tracker tracker = stateManager.getDefaultTracker();
@@ -422,6 +410,17 @@ public class MainActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
 
+    }
+
+    private void changeSearchView(int position){
+        if ( position == CONSTANTS.PAGE_ABREPEATLIST || position == CONSTANTS.PAGE_PLAYER){
+            searchView.setVisibility(View.GONE);
+        }else{
+            //다른 목록으로 넘어가면 검색 취소
+            searchView.setIconified(true);
+            searchView.setIconified(true);
+            searchView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void searchViewClearFocus(boolean isIconified) {
@@ -655,7 +654,8 @@ public class MainActivity extends AppCompatActivity implements
                     String action = intent.getAction();
                     DLog.v("MainActivity get an Intent : " + action);
                     if (action.equals(ACTION.RefreshScreen)) {
-
+                        PlayItem playItem = stateManager.getCurrentPlayItem();
+                        refreshScreen(playItem);
                     } else if (action.equals(ACTION.EXIT)) {
                         soundService.onStopPlay();
                         unbindSoundService();
@@ -725,6 +725,8 @@ public class MainActivity extends AppCompatActivity implements
                         } else {
                             changeIcon(playButton, R.drawable.ic_pause_white_24dp);
                         }
+                    } else if(action.equals(ACTION.CREATEDPLAYERFREGMENT)){
+                        initScreenState();
                     }
 
                 } catch (NullPointerException e) {
@@ -789,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initMember(Bundle savedInstanceState) {
-
+        initSoundService(savedInstanceState);
         if(stateManager == null)
         {
             if (savedInstanceState == null) {
@@ -804,9 +806,10 @@ public class MainActivity extends AppCompatActivity implements
     //최초 실행시점에서 soundservice가 널 일때만 생성.
     @Override
     protected void onStart() {
+        DLog.d(LOG_TAG, "onStart");
         super.onStart();
 
-        initMember(null);
+        //initMember(null);
 
         IntentFilter intentFilter = new IntentFilter(ACTION.RefreshScreen);
         intentFilter.addAction(ACTION.EXIT);
@@ -816,6 +819,7 @@ public class MainActivity extends AppCompatActivity implements
         intentFilter.addAction(ACTION.ShowSnackBar);
         intentFilter.addAction(ACTION.PLAY);
         intentFilter.addAction(ACTION.ChangePlayerState);
+        intentFilter.addAction(ACTION.CREATEDPLAYERFREGMENT);
 
         LocalBroadcastManager.getInstance(this).registerReceiver((broadcastReceiver), intentFilter);
 
@@ -827,6 +831,11 @@ public class MainActivity extends AppCompatActivity implements
             onStartCount++;
         }
 
+        if (msgHandler == null) {
+            msgHandler = new MessageHandler();
+        }
+
+
     }
 
     @Override
@@ -837,20 +846,19 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onDestroy() {
-        if(isSoundServiceBound()){
-            unbindSoundService();
-        }
-
-
+        DLog.d(LOG_TAG, "onDestroy");
+        unbindSoundService();
         super.onDestroy();
     }
 
     private void unbindSoundService(){
+        DLog.d(LOG_TAG, "unbindSoundService");
         if (isSoundServiceBound()) {
-            unbindService(soundConnection);
+            getApplicationContext().unbindService(soundConnection);
             soundServiceBound = false;
         }
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -861,12 +869,12 @@ public class MainActivity extends AppCompatActivity implements
             searchView = (SearchView) searchItem.getActionView();
             searchView.setOnQueryTextListener(this);
             searchView.setIconifiedByDefault(true);
-            searchView.setIconified(true);
-            searchView.setVisibility(View.GONE);
+//            searchView.setIconified(true);
+//            searchView.setVisibility(View.GONE);
+            changeSearchView(tabs.getSelectedTabPosition());
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-
 
         return true;
     }
@@ -909,6 +917,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         if (filterable != null) {
+            ((AbstractMediaArrayAdapter)(filterable)).initLastPosition();
             filter = filterable.getFilter();
         }
 

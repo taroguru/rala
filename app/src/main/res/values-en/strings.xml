@@ -1,5 +1,4 @@
 <resources>
-    <string name="low_banner_ad_unit_id">ca-app-pub-4015379103470952~9117146821</string>
     <string name="app_name">Rala</string>
     <string name="MenuTitle_RepeatList">Repeat</string>
     <string name="delete">Delete</string>
@@ -65,4 +64,5 @@
     <string name="happy_with_rala">Ralala with Rala</string>
     <string name="channel_description">Rala Notification Player</string>
     <string name="noti_player_name">Rala Notification Player</string>
+    <string name="shuffle">Random</string>
 </resources>

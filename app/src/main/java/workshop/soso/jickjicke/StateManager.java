@@ -11,6 +11,8 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -19,7 +21,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import workshop.soso.jickjicke.db.LoadFileABRepeatTask;
 import workshop.soso.jickjicke.intent.ACTION;
 import workshop.soso.jickjicke.sound.MediaPlayerStateMachine;
@@ -39,6 +40,7 @@ public class StateManager extends Application implements Serializable {
     public static final String PREF_CURRENT_POSITION = "PREF_CURRENT_POSITION";
     public static final String PREF_LOOP = "PREF_LOOP";
     public static final String PREF_SPEED = "PREF_SPEED";
+    public static final String PREF_RANDOM = "PREF_RANDOM";
     public static final String PREF_CREATE_NOTIFICATION_CHANNEL = "PREF_NOTIFICATION_CHANNEL";
 
     public static boolean DEBUG;   //현재  debug모드인지, release모드인지 확인.
@@ -289,7 +291,18 @@ public class StateManager extends Application implements Serializable {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(PREF_LOOP, LoopState.toInteger(isLoop));
         editor.commit();
+    }
 
+
+    public boolean getRandom() {
+        return getBooleanSharedPreference(PREF_RANDOM, false) ;
+    }
+
+    public void setRandom(boolean isShuffle) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(PREF_RANDOM, isShuffle);
+        editor.commit();
     }
 
     public boolean isCreateNotificationChannel(){
@@ -392,6 +405,11 @@ public class StateManager extends Application implements Serializable {
         return hasItem;
     }
 
+
+    private boolean getBooleanSharedPreference(String key, boolean defaultValue) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        return sp.getBoolean(key, defaultValue);    //최초 실행시 값이 없을 때 play할 아이템이 없다고 하자.
+    }
 
     private int getIntSharedPreference(String key, int defaultValue) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());

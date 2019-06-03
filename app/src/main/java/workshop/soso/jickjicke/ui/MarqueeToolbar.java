@@ -1,10 +1,11 @@
 package workshop.soso.jickjicke.ui;
 
 import android.content.Context;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
 
 import java.lang.reflect.Field;
 

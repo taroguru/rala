@@ -100,8 +100,9 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/SwitchLabel"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:gravity="center"
+                android:layout_gravity="top|left"
                 android:text="@string/loop" />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -114,9 +115,21 @@
 
             <androidx.appcompat.widget.AppCompatTextView
                 style="@style/SwitchLabel"
-                android:layout_gravity="bottom"
+                android:layout_width="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:text="@string/shuffle" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/shuffleSiwtch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="20dp" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/SwitchLabel"
+                android:layout_gravity="bottom|left"
                 android:layout_marginBottom="20dp"
-                android:gravity="center_vertical"
                 android:text="@string/abrepeat" />
 
             <androidx.appcompat.widget.SwitchCompat

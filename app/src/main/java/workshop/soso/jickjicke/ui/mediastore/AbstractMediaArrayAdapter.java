@@ -4,10 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,10 @@ abstract public class AbstractMediaArrayAdapter<T extends ArrayItem> extends Mul
 
     public int getLastPosition() {
         return lastPosition;
+    }
+
+    public void initLastPosition(){
+        setLastPosition(-1);
     }
 
     public void setLastPosition(int lastPosition) {

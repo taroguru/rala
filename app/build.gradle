@@ -13,8 +13,8 @@ android {
         minSdkVersion 18        //최소 sdk 버전. JELLY_BEAN
 
         targetSdkVersion 28     //앱의 동작 sdk 버전. 21=lollipop
-        versionCode 27
-        versionName "1.1.7"
+        versionCode 30
+        versionName "1.2.0"
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

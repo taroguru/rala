@@ -12,7 +12,10 @@ import java.io.IOException;
 public class StateSoundPlayer extends MediaPlayer {
     //야매로 동기화.
     private MediaPlayerStateMachine stateMachine;
-    public MediaPlayerStateMachine.State getState(){return stateMachine.getState();}
+    public MediaPlayerStateMachine.State getState(){
+        if(stateMachine == null)        return MediaPlayerStateMachine.State.ERROR;
+        return                          stateMachine.getState();
+    }
     private Context context;
 
     public MediaPlayerStateMachine getStateMachine() {
@@ -98,6 +101,7 @@ public class StateSoundPlayer extends MediaPlayer {
     @Override
     public int getCurrentPosition() {
         int position = 0;
+        if(getState() == null)   return position;
 
         try
         {

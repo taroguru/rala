@@ -39,4 +39,5 @@ public class ACTION {
     public static final String AddPlayList = "AddPlayList";
 
     public static final String ShowSnackBar = "ShowSnackBar";
+    public static final String CREATEDPLAYERFREGMENT = "CreatedPlayerFregment";
 }

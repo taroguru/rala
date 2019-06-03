@@ -15,6 +15,11 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -22,10 +27,6 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import workshop.soso.jickjicke.ABRepeat;
 import workshop.soso.jickjicke.CONSTANTS;
 import workshop.soso.jickjicke.PlayItem;
@@ -57,7 +58,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     @Override
     public void changeButton(FloatingActionButton floatingButton) {
         try {
-            GUIHelper.changeFloatingButtonToSearch( getActivity(), floatingButton, CONSTANTS.PAGE_ALL_AUDIO_LIST);
+            GUIHelper.changeFloatingButtonToSearch( getContext(), floatingButton, CONSTANTS.PAGE_ALL_AUDIO_LIST);
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -88,7 +89,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     private String LOG_TAG = "PlayFragment";
 
     private SwitchCompat loopSwitch = null;
-    //private SwitchCompat randomSwitch = null;
+    private SwitchCompat randomSwitch = null;
     private SwitchCompat repeatSwitch = null;
 
     private CardView buttonPlay = null;
@@ -158,6 +159,9 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
                         } else if (action.equals(ACTION.ChangePlayerState)) {
 //                        MediaPlayerStateMachine.State state = (MediaPlayerStateMachine.State)intent.getSerializableExtra(ACTION.State);
 //                        DLog.v("noti", state.toString());
+                            refreshButtons();
+                        } else if (action.equals(ACTION.RefreshScreen)) {
+                            refreshScreen();
                             refreshButtons();
                         }
                     } catch (NullPointerException e) {
@@ -268,6 +272,8 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
         loopSwitch = rootView.findViewById(R.id.loopsiwtch);
         loopSwitch.setOnCheckedChangeListener(switchListener);
+        randomSwitch = rootView.findViewById(R.id.shuffleSiwtch);
+        randomSwitch.setOnCheckedChangeListener(switchListener);
         repeatSwitch = rootView.findViewById(R.id.repeatsiwtch);
         repeatSwitch.setOnCheckedChangeListener(switchListener);
 
@@ -344,11 +350,20 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
             moveToSavedState(savedInstanceState);
         }
 
-
-        refreshButtons();
+        //fragment생성 후에
+        Utility.sendIntentLocalBroadcast(getContext(), ACTION.CREATEDPLAYERFREGMENT);
 
         return rootView;
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        refreshButtons();
+
+    }
+
 
     private void changedSwitch(CompoundButton buttonView, boolean isChecked) {
         int id = buttonView.getId();
@@ -369,8 +384,9 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
                     moveToIdleState();
                 }
                 break;
-//            case R.id.randomsiwtch:
-//                break;
+            case R.id.shuffleSiwtch:
+                stateManager.setRandom(isChecked);
+                break;
         }
     }
 
@@ -656,14 +672,14 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     public void refreshTimeLabel() {
 //        DLog.v("CurrentState = " + playSoundListener.onGetPlayerState());
-        if (playSoundListener != null && textCurrentTime != null && isStarted()) {
+        if (playSoundListener != null && textCurrentTime != null){// && isStarted()) {
             String currentTimeStr = Utility.convertMsecToMin(playSoundListener.onGetCurrentPosition());
             textCurrentTime.setText(currentTimeStr);
         }
     }
 
     public void refreshProgress() {
-        if (playSoundListener != null && isStarted()) {
+        if (playSoundListener != null){// && isStarted()) {
             int currentPosition = playSoundListener.onGetCurrentPosition();
             int max = playingSeekBarFirst.getMax();
             if (currentPosition <= max) {

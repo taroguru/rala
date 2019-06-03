@@ -1,5 +1,4 @@
 <resources>
-    <string name="low_banner_ad_unit_id">ca-app-pub-4015379103470952~9117146821</string>
     <string name="app_name">랄라</string>
     <string name="MenuTitle_RepeatList">구간반복</string>
     <string name="delete">삭제</string>
@@ -65,4 +64,5 @@
     <string name="happy_with_rala">랄라와 함께 랄랄라</string>
     <string name="channel_description">랄라 알림 플레이어</string>
     <string name="noti_player_name">랄라 알림 플레이어</string>
+    <string name="shuffle">랜덤재생</string>
 </resources>

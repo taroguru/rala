@@ -38,6 +38,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -233,7 +234,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCreate() {
-        Log.v(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate");
         super.onCreate();
         initMembers();
 
@@ -381,20 +382,29 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onDestroy() {
+        DLog.d(LOG_TAG, "onDestroy");
         mNotificationManager.cancel(NOTIFICATION_PLAYER);
         if (telephonyManager != null) {
             telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
         }
 
+        try{
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }catch(IllegalStateException e){
+            e.printStackTrace();
+        }catch(NullPointerException e){
+            DLog.d("MediaPlayer is already null");
+        }
+
         stopSelf();
         super.onDestroy();
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        DLog.v(LOG_TAG, "onStartCommand() : " + action);
+        DLog.d(LOG_TAG, "onStartCommand() : " + action);
 
         if(action == null || action.isEmpty())
         {
@@ -619,6 +629,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     private void initMediaPlayer() {
         //1. create and set mediaplayer
+        DLog.d(LOG_TAG, "initMediaPlayer");
         mediaPlayer = new StateSoundPlayer();
         mediaPlayer.setContext(this);
 
@@ -858,9 +869,15 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private int calculatePrevIndex(int currentIndex, int nSoundFileCount) {
+        StateManager stateManager = getStateManager(this);
+        boolean isRandom = stateManager.getRandom();
+
         if (currentIndex == StateManager.NO_PLAYABLE_TRACK || nSoundFileCount <= 0) {
             ShortTask.showSnack(this, R.string.play_list_is_empty);
-        } else if (currentIndex == 0) {
+        } else if(isRandom){
+            currentIndex = calculateRandomIndex(currentIndex, nSoundFileCount);
+        }
+        else if (currentIndex == 0) {
             currentIndex = nSoundFileCount - 1;
         } else {
             currentIndex--;
@@ -884,8 +901,9 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     private int getNextIndex() {
         StateManager stateManager = getStateManager(this);
-        int currentIndex = stateManager.getCurrentPosition();
         int playlistLength = stateManager.getCurrentPlayList().getItemlist().size();
+        int currentIndex = stateManager.getCurrentPosition();
+
         StateManager.LoopState isLoop = stateManager.getLoop();
 
         int originIndex = currentIndex;
@@ -896,12 +914,27 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private int calculateNextIndex(int currentIndex, int playlistLength) {
-        if (currentIndex + 1 >= playlistLength) {
+        StateManager stateManager = getStateManager(this);
+        boolean isRandom = stateManager.getRandom();
+
+        if(isRandom){
+            currentIndex = calculateRandomIndex(currentIndex, playlistLength);
+        }
+        else if (currentIndex + 1 >= playlistLength) {
             currentIndex = 0;   //첫곡으로.
         } else {
             currentIndex++;
         }
         return currentIndex;
+    }
+
+    private int calculateRandomIndex(int currentIndex, int playlistLength){
+        Random random = new Random();
+        int candidate = 0;
+        do{
+            candidate = random.nextInt(playlistLength);
+        } while(candidate == currentIndex);
+        return candidate;
     }
 
     private void showTrackInfo(int currentIndex, int nSoundFileCount,
@@ -1113,6 +1146,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
         return position;
     }
+
 
 
 //api >= 23
