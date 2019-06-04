@@ -110,10 +110,17 @@
     <style name="SwitchLabel">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">27dp</item>
+        <item name="android:layout_gravity">left|center_vertical</item>
         <item name="android:layout_marginLeft">20dp</item>
         <item name="android:textSize">20dp</item>
         <item name="android:fontFamily">@font/nanumsquareregular</item>
     </style>
+    <style name="SwitchRight">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+
+    </style>
+
     <style name="TimeLabel">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>

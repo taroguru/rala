@@ -97,61 +97,88 @@
             android:textColor="@color/player_button_text_color"
             card_view:cardBackgroundColor="@color/white"
             card_view:cardCornerRadius="0dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:weightSum="3">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:paddingTop="5dp"
+                    android:weightSum="3">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2">
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/SwitchLabel"
+                            android:text="@string/loop" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/loopsiwtch"
+                            style="@style/SwitchRight" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2">
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/SwitchLabel"
+                            android:text="@string/shuffle" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/shuffleSiwtch"
+                            style="@style/SwitchRight" />
+                    </LinearLayout>
+                </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/SwitchLabel"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="top|left"
-                android:text="@string/loop" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/loopsiwtch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="20dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/SwitchLabel"
-                android:layout_width="wrap_content"
-                android:layout_gravity="left|center_vertical"
-                android:text="@string/shuffle" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/shuffleSiwtch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="20dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                style="@style/SwitchLabel"
-                android:layout_gravity="bottom|left"
-                android:layout_marginBottom="20dp"
-                android:text="@string/abrepeat" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/repeatsiwtch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/loopsiwtch"
-                android:layout_gravity="bottom|right"
-                android:layout_marginBottom="20dp"
-                android:layout_marginRight="20dp"
-                android:gravity="center_vertical" />
-            <!--    나중에 살리자
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/random"/>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/randomsiwtch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Random" />
-            -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:paddingBottom="5dp"
+                    android:weightSum="3">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2">
+                        <androidx.appcompat.widget.AppCompatTextView
+                            style="@style/SwitchLabel"
+                            android:text="@string/abrepeat" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center">
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/repeatsiwtch"
+                            style="@style/SwitchRight"
+                             />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
 
 
         </androidx.cardview.widget.CardView>
