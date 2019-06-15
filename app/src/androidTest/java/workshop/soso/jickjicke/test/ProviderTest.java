@@ -3,43 +3,50 @@ package workshop.soso.jickjicke.test;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.test.AndroidTestCase;
+
+import androidx.test.InstrumentationRegistry;
 
 import workshop.soso.jickjicke.db.SoundContract;
 import workshop.soso.jickjicke.util.DLog;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-public class ProviderTest extends AndroidTestCase{
+
+public class ProviderTest {
 
 
     private static final String LOG_TAG = "ProviderTest";
 
     // brings our database to an empty state
     public void deleteAllRecords() {
-        mContext.getContentResolver().delete(
+        Context context = InstrumentationRegistry.getContext();
+        
+        context.getContentResolver().delete(
                 SoundContract.DBABRepeat.CONTENT_URI,
                 null,
                 null
         );
-        mContext.getContentResolver().delete(
+        context.getContentResolver().delete(
                 SoundContract.DBPlaylistItem.CONTENT_URI,
                 null,
                 null
         );
-        mContext.getContentResolver().delete(
+        context.getContentResolver().delete(
                 SoundContract.DBPlaylist.CONTENT_URI,
                 null,
                 null
         );
-        mContext.getContentResolver().delete(
+        context.getContentResolver().delete(
                 SoundContract.DBSoundFile.CONTENT_URI,
                 null,
                 null
         );
 
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = context.getContentResolver().query(
                 SoundContract.DBPlaylist.CONTENT_URI,
                 null,
                 null,
@@ -49,7 +56,7 @@ public class ProviderTest extends AndroidTestCase{
         assertEquals(0, cursor.getCount());
         cursor.close();
 
-        cursor = mContext.getContentResolver().query(
+        cursor = context.getContentResolver().query(
                 SoundContract.DBSoundFile.CONTENT_URI,
                 null,
                 null,
@@ -59,7 +66,7 @@ public class ProviderTest extends AndroidTestCase{
         assertEquals(0, cursor.getCount());
         cursor.close();
 
-        cursor = mContext.getContentResolver().query(
+        cursor = context.getContentResolver().query(
                 SoundContract.DBABRepeat.CONTENT_URI,
                 null,
                 null,
@@ -69,7 +76,7 @@ public class ProviderTest extends AndroidTestCase{
         assertEquals(0, cursor.getCount());
         cursor.close();
 
-        cursor = mContext.getContentResolver().query(
+        cursor = context.getContentResolver().query(
                 SoundContract.DBPlaylistItem.CONTENT_URI,
                 null,
                 null,
@@ -86,9 +93,10 @@ public class ProviderTest extends AndroidTestCase{
     }
 
     public void testFullPlayItem(){
+        Context context = InstrumentationRegistry.getContext();
 
         ContentValues value = TestDb.createFileInfoValues();
-        ContentResolver contentResolver = mContext.getContentResolver();
+        ContentResolver contentResolver = context.getContentResolver();
 
         Uri insertedFileUri = contentResolver.insert(SoundContract.DBSoundFile.CONTENT_URI, value);
         long fileId = ContentUris.parseId(insertedFileUri);
@@ -128,17 +136,19 @@ public class ProviderTest extends AndroidTestCase{
 
 
     public void testInsertOneItem() {
+        Context context = InstrumentationRegistry.getContext();
+
         //파일 아이템 추가.
         ContentValues value = TestDb.createFileInfoValues();
 
-        Uri insertedFileUri = mContext.getContentResolver().insert(SoundContract.DBSoundFile.CONTENT_URI, value);
+        Uri insertedFileUri = context.getContentResolver().insert(SoundContract.DBSoundFile.CONTENT_URI, value);
         long fileId = ContentUris.parseId(insertedFileUri);
 
         // Verify we got a row back.
         assertTrue(fileId != -1);
 
         // A cursor is your primary interface to the query results.
-        Cursor cursor = mContext.getContentResolver().query(
+        Cursor cursor = context.getContentResolver().query(
                 SoundContract.DBSoundFile.CONTENT_URI,
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
@@ -149,7 +159,7 @@ public class ProviderTest extends AndroidTestCase{
         TestDb.validateCursor(cursor, value);
 
         // Now see if we can successfully query if we include the row id
-        cursor = mContext.getContentResolver().query(
+        cursor = context.getContentResolver().query(
                 SoundContract.DBSoundFile.buildSoundfileUri(fileId),
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause

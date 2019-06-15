@@ -1,10 +1,14 @@
 package workshop.soso.jickjicke.test;
 
-import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.test.AndroidTestCase;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
+
+import org.junit.runner.RunWith;
 
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +18,15 @@ import workshop.soso.jickjicke.db.SoundContract.DBPlaylist;
 import workshop.soso.jickjicke.db.SoundDBHelper;
 import workshop.soso.jickjicke.util.DLog;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
+
 /**
  * Created by taroguru on 2015. 3. 13..
  */
-public class TestDb extends AndroidTestCase{
+@RunWith(AndroidJUnit4.class)
+public class TestDb {
 
     private static final String LOG_TAG = "TestDB";
 
@@ -78,19 +87,19 @@ public class TestDb extends AndroidTestCase{
     }
 
     public void testCreateDb() throws Throwable {
-        mContext.deleteDatabase(SoundDBHelper.DATABASE_NAME);
-        SQLiteDatabase db = new SoundDBHelper(
-                this.mContext).getWritableDatabase();
+        Context context = InstrumentationRegistry.getContext();
+        context.deleteDatabase(SoundDBHelper.DATABASE_NAME);
+        SQLiteDatabase db = new SoundDBHelper(context).getWritableDatabase();
         assertEquals(true, db.isOpen());
         db.close();
-
     }
 
     public void testInsertReadDb() {
 
         // If there's an error in those massive SQL table creation Strings,
         // errors will be thrown here when you try to get a writable database.
-        SoundDBHelper dbHelper = new SoundDBHelper(mContext);
+        Context context = InstrumentationRegistry.getContext();
+        SoundDBHelper dbHelper = new SoundDBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = createFileInfoValues();

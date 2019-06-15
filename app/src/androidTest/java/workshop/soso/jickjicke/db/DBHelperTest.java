@@ -2,10 +2,9 @@ package workshop.soso.jickjicke.db;
 
 import android.content.Context;
 import android.net.Uri;
+
 import androidx.test.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +18,16 @@ import workshop.soso.jickjicke.StateManager;
 import workshop.soso.jickjicke.util.DLog;
 import workshop.soso.jickjicke.util.Utility;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by taroguru on 2017. 4. 23..
  */
 @RunWith(AndroidJUnit4.class)
 //@SmallTest
-public class DBHelperTest extends TestCase {
+public class DBHelperTest {
     private Context context;
     private StateManager stateManager;
 
