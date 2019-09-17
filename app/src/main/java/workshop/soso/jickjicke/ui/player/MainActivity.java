@@ -163,22 +163,21 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        outState.putSerializable(KEY_STATEMANAGER, stateManager);
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onSaveInstanceState()");
         outState.putBoolean(KEY_SERVICE_BIND, isSoundServiceBound());
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onRestoreInstanceState()");
         super.onRestoreInstanceState(savedInstanceState);
-        stateManager =  (StateManager) savedInstanceState.getSerializable(KEY_STATEMANAGER);
         soundServiceBound = savedInstanceState.getBoolean(KEY_SERVICE_BIND);
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DLog.d(LOG_TAG, "onCreate");
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onCreate()");
         super.onCreate(savedInstanceState);
 
         initEnterAnimation(savedInstanceState);
@@ -493,6 +492,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onResume() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onResume()");
         super.onResume();
         stateManager.launchAppFirstTime();
         refreshScreen(stateManager.getCurrentPlayItem());    //현재 화면으로 돌아온 경우 화면 갱신함
@@ -799,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements
     //최초 실행시점에서 soundservice가 널 일때만 생성.
     @Override
     protected void onStart() {
-        DLog.d(LOG_TAG, "onStart");
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onStart()");
         super.onStart();
 
         //initMember(null);
@@ -833,19 +833,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onStop()");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        DLog.d(LOG_TAG, "onDestroy");
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onDestroy()");
         unbindSoundService();
         super.onDestroy();
     }
 
     private void unbindSoundService(){
-        DLog.d(LOG_TAG, "unbindSoundService");
+        DLog.d(CONSTANTS.LOG_LIFECYCLE, "unbindSoundService");
         if (isSoundServiceBound()) {
             getApplicationContext().unbindService(soundConnection);
             soundServiceBound = false;

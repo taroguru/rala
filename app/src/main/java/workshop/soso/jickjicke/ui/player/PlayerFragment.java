@@ -188,6 +188,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     @Override
     public void onResume() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onResume()");
         super.onResume();
         initializeMember();
         //다시 시작하면 뭔가 재생중일 수 있으므로 현재 곡 기준으로 화면을 갱신합니다.
@@ -210,6 +211,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     @Override
     public void onPause() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onPause()");
         super.onPause();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
         //ui thread
@@ -229,6 +231,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onCreate()");
         super.onCreate(savedInstanceState);
         initializeMember();
     }
@@ -263,6 +266,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onCreateView()");
         rootView = inflater.inflate(R.layout.player_fragment_main, container,
                 false);
 
@@ -358,6 +362,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     @Override
     public void onStart() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onStart()");
         super.onStart();
 
         refreshButtons();
@@ -792,6 +797,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onSaveInstanceState()");
         super.onSaveInstanceState(outState);
         outState.putSerializable(KEY_ABREPEATFORNEW, abRepeatForNew);
     }

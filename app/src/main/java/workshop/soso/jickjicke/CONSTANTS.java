@@ -55,4 +55,8 @@ public class CONSTANTS {
     public static final String EVENT_LISTITEM_CLICK = "Click ListItem";
     public static final String EVENT_LISTITEM_LONGCLICK = "Longclick ListItem";
     public static final String EVENT_LISTITEM_MORE_CLICK = "Click ListItem More Button";
+
+    public static final String LOG_LIFECYCLE = "ANDROID_LIFE";
+    public static final String TAG_NOTIFICATION = "JICKJICK.NOTIFICATION";
+
 }
