@@ -27,7 +27,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.appcompat.widget.AppCompatDrawableManager;
@@ -60,9 +59,7 @@ import static androidx.core.app.NotificationCompat.CATEGORY_SERVICE;
 
 public class SoundService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, OnPlaySoundListener {
     //const
-    private static final int NOTIFICATION_PLAYER = 572;
     public static final int MONITOR_STATE = 4;
-
 
     private final String LOG_TAG = "SoundService";
     StateSoundPlayer mediaPlayer = null;
@@ -74,6 +71,10 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     private Timer refreshTimer;
     private TimerTask refreshStateTask;
     private MessageHandler msgHandler;
+
+    RemoteViews notificationView;
+    NotificationCompat.Builder mBuilder;
+    NotificationManager mNotificationManager;
 
     private class MessageHandler extends Handler {
         @Override
@@ -234,20 +235,18 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCreate() {
-        Log.d(LOG_TAG, "onCreate");
+        DLog.d(CONSTANTS.LOG_LIFECYCLE, "onCreate");
         super.onCreate();
         initMembers();
-
         initLocalBroadcastReceiver();
         initListener();
         rescheduleTimerTask();
-
-
     }
 
     private void startForegroundService() {
-        Notification notificationPlayer = initNotification();
-        startForeground(CONSTANTS.NOTIFICATIONID, notificationPlayer);
+        DLog.d(CONSTANTS.LOG_LIFECYCLE, "startForegroundService");
+        makeNotificationBuilder();
+        startForeground(CONSTANTS.NOTIFICATIONID, mBuilder.build());
     }
 
     //전화가 왔을 때 재생중이면 일시정지
@@ -266,7 +265,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                             if (onIsNowPlaying() == true) {
                                 onPausePlayingMusic();
                             }
-
                         }
                         super.onCallStateChanged(state, incomingNumber);
                     }
@@ -290,7 +288,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 msgHandler.sendEmptyMessage(MONITOR_STATE);
             }
         };
-
         refreshTimer = new Timer();
         refreshTimer.schedule(refreshStateTask, 30, 30);
     }
@@ -313,15 +310,19 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 }
                 else if (action.equals(ACTION.ChangePlayerState)) {
                     MediaPlayerStateMachine.State state = (MediaPlayerStateMachine.State) intent.getSerializableExtra(ACTION.State);
-                    DLog.v("noti", state.toString());
-
-                    if (state == MediaPlayerStateMachine.State.END || state == MediaPlayerStateMachine.State.ERROR ||
+                    DLog.v(CONSTANTS.TAG_NOTIFICATION, state.toString());
+                    if(state == MediaPlayerStateMachine.State.END){
+                        DLog.v(CONSTANTS.TAG_NOTIFICATION, "goodbye notification");  // 종료 시점에 notification을 보냅시다
+                        notificationCancel();
+                    } else if (state == MediaPlayerStateMachine.State.ERROR ||
                             state == MediaPlayerStateMachine.State.IDLE || state == MediaPlayerStateMachine.State.INITIALIZED ||
                             state == MediaPlayerStateMachine.State.PREPARING || state == MediaPlayerStateMachine.State.PREPARED) {
-                        DLog.v("noti", "don't refresh noti");   //요기가 범인.
+                        DLog.v(CONSTANTS.TAG_NOTIFICATION, "don't refresh noti");   //요기가 범인.
                     } else if (Utility.isPlayButtonState(state)) {
+                        DLog.v(CONSTANTS.TAG_NOTIFICATION, "notification icon : PLAY");
                         changeNotiPlayButtonImage(R.drawable.ic_play_noti_24dp);
                     } else {
+                        DLog.v(CONSTANTS.TAG_NOTIFICATION, "notification icon : PAUSE");
                         changeNotiPlayButtonImage(R.drawable.ic_pause_black_24dp);
                     }
                 } else if (action.equals(ACTION.OnABRepeatMode)) {
@@ -372,39 +373,41 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         intentFilter.addAction(ACTION.PLAY_NEXT_REPEAT);
         intentFilter.addAction(ACTION.PLAY_NEXT_PLAYITEM);
         intentFilter.addAction(ACTION.StartSoundService);
-//        intentFilter.addAction(ACTION.EXIT);
-        //intentFilter.addAction(ACTION.PAUSE);
-
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-
     }
 
 
     @Override
     public void onDestroy() {
-        DLog.d(LOG_TAG, "onDestroy");
-        mNotificationManager.cancel(NOTIFICATION_PLAYER);
-        if (telephonyManager != null) {
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
-        }
-
+        DLog.d(CONSTANTS.LOG_LIFECYCLE, "onDestroy");
+        stopSoundService();
+        super.onDestroy();
+    }
+    private void notificationCancel()
+    {
+        mNotificationManager.cancel(CONSTANTS.NOTIFICATIONID);
+    }
+    private void stopSoundService()
+    {
         try{
-            mediaPlayer.stop();
+            onStopPlay();
             mediaPlayer.release();
+            notificationCancel();
+            if (telephonyManager != null) {
+                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+            }
+            stopForeground(true);
+            stopSelf();
         }catch(IllegalStateException e){
             e.printStackTrace();
         }catch(NullPointerException e){
             DLog.d("MediaPlayer is already null");
         }
-
-        stopSelf();
-        super.onDestroy();
     }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        DLog.d(LOG_TAG, "onStartCommand() : " + action);
+        DLog.d(CONSTANTS.LOG_LIFECYCLE, "onStartCommand() : " + action);
 
         if(action == null || action.isEmpty())
         {
@@ -447,13 +450,11 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         } else if (action.equals(ACTION.PLAY_NEXT_PLAYITEM)) {
             onNextTrack();
         } else if (action.equals(ACTION.EXIT)) {
-            mNotificationManager.cancel(NOTIFICATION_PLAYER);
-            onStopPlay();
-            Utility.sendIntentLocalBroadcast(this, ACTION.EXIT);
+            DLog.v(CONSTANTS.LOG_LIFECYCLE, "ACTION.EXIT");
+            stopSoundService();
         } else {
             DLog.v("unknown action : " + action);
         }
-
         return START_STICKY;
     }
 
@@ -468,11 +469,9 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             if (notiImage == null) {
                 notiImage = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
             }
-
             mBuilder.setLargeIcon(notiImage);
             notifyChangeNotification();
         }
-
     }
 
     private void changeNotiPlayButtonImage(int imgResource) {
@@ -511,25 +510,17 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private void notifyChangeNotification() {
-//        Toast.makeText(this, "notification changed", Toast.LENGTH_LONG).show();
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "Notification Notify");
         mBuilder.setContent(notificationView);
-        mNotificationManager.notify(NOTIFICATION_PLAYER, mBuilder.build());
+        mNotificationManager.notify(CONSTANTS.NOTIFICATIONID, mBuilder.build());
     }
 
-    RemoteViews notificationView;
-    NotificationCompat.Builder mBuilder;
-    NotificationManager mNotificationManager;
-
-    private Notification initNotification() {
-        DLog.v("init Notification View and Event");
-
-        DLog.v("init Notification View. set drawables to imagebutton");
+    private void makeNotificationBuilder() {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "init Notification View and Event");
         notificationView = new RemoteViews(getPackageName(), R.layout.notification_player_normal);
         changeNotiViewImage(R.id.buttonPrevPlayItem, R.drawable.ic_skip_previous_black_24dp, false);
         changeNotiViewImage(R.id.buttonPlay, R.drawable.ic_play_noti_24dp, false);
         changeNotiViewImage(R.id.buttonNextPlayItem, R.drawable.ic_skip_next_black_24dp, false);
-
-
 
         DLog.v("init PendingIntent");
         PendingIntent playPrevPlayItem = makePendingIntent(ACTION.PLAY_PREV_PLAYITEM);
@@ -569,7 +560,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
         mBuilder =
                 new NotificationCompat.Builder(this, CONSTANTS.NOTICHANNELID)
-//                        .setSmallIcon(R.drawable.ic_repeat_white_24dp)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText("content text")
                         .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
@@ -584,10 +574,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             //todo. noti status bar의 아이콘이 vector image인 경우, kitkat 이하의 버전에서 에러 발생
             mBuilder.setSmallIcon(R.drawable.ic_repeat_white_24dp);
         }
-        Notification notificationPlayer = mBuilder.build();
-        //mNotificationManager.notify(NOTIFICATION_PLAYER, notificationPlayer);
-
-        return notificationPlayer;
 
     }
 
@@ -610,14 +596,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         PendingIntent resultPendingIntent;
         Intent resultIntent = new Intent(this, MainActivity.class);
 
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-// Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(MainActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent =
                 stackBuilder.getPendingIntent(
@@ -682,7 +662,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
 
                 try {
-//                    mediaPlayer.release();
                     mediaPlayer.reset();
                     mediaPlayer.setDataSource(filePath);
                     mediaPlayer.prepareAsync();
@@ -691,7 +670,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                         mediaPlayer.setLooping(true);
                     }
                     refreshPlayerState(playlistIndex, position);
-//                    result = true;  //todo. success를 여기서 판단할 수 있는데, 밖에서는 함수가 다 돌아서 어쩔 수가 없네
                 } catch (NullPointerException e) {
                     DLog.e("SoundService", "MediaPlayer is Null.");
                     e.printStackTrace();
@@ -1051,7 +1029,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     public void pause() {
-        Log.v(LOG_TAG, "pause player");
+        DLog.v(LOG_TAG, "pause player");
         try {
             mediaPlayer.pause();
         } catch (IllegalStateException e) {
@@ -1061,7 +1039,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     public boolean resume() {
         boolean result = false;
-        Log.v(LOG_TAG, "resume player");
+        DLog.v(LOG_TAG, "resume player");
         try {
             mediaPlayer.start();
             result = true;
@@ -1076,22 +1054,14 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.v(LOG_TAG, "onBind");
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onBind");
         return soundBind;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.v(LOG_TAG, "onUnbind");
-        //unbind타이밍에 stop을 하면 안된다. MainActivity의 onDestroy타이밍에 unbind를 거는데,
-        //백그라운드에서 나와야 할 소리가 멈춤.
-//        try {
+        DLog.v(CONSTANTS.LOG_LIFECYCLE, "onUnbind");
 
-//            mediaPlayer.stop();
-//            mediaPlayer.release();
-//        } catch (IllegalStateException e) {
-//            e.printStackTrace();
-//        }
         return false;
     }
 
