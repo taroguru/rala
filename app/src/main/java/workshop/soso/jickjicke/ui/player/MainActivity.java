@@ -72,33 +72,19 @@ import workshop.soso.jickjicke.util.GUIHelper;
 import workshop.soso.jickjicke.util.Utility;
 
 
-public class MainActivity extends AppCompatActivity implements
-        OnPlaySoundListener, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements OnPlaySoundListener, SearchView.OnQueryTextListener {
 
-    public static final int REQ_CODE_ADD_PLAYITEM = 0;
-    private static final String KEY_STATEMANAGER = "KEY_STATEMANAGER";
     private static final String KEY_SERVICE_BIND = "KEY_SERVICE_BIND";
 
     private Adapter adapter;
     private BroadcastReceiver broadcastReceiver;
-    public static final String EXTRA_MESSAGE = "workshop.soso.jickjicke.MESSAGE";
 
 
-    // fragment ids
-    public static final String FRAGMENT_ID_FILELIST = "filelist";
-    public static final String FRAGMENT_ID_MAIN = "main";
+    private CoordinatorLayout coordinatorLayout;
 
     private TabLayout tabs;
     private int onStartCount;
 
-
-    private static final String LOG_TAG = "MainActivity";
-    //
-    private CoordinatorLayout coordinatorLayout;
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the
-     * navigation drawer.
-     */
     //viewpager
     private ViewPager viewPager;
     //fragments
@@ -109,15 +95,11 @@ public class MainActivity extends AppCompatActivity implements
     private AudioListFragment allAudioFragment;
     private PlayListFragment playlistFragment;
 
-    private MediaStoreFragment mMediaFragmentFragment;
-
     //for bottom player
-    //private TextView txtAlbumArtist;
     private ImageView imgAlbum;
     private TextView txtTime;
     private TextView txtCurrentTime;
     private CardView playButton;
-
 
     //accessories : floating button, searchview...
     private FloatingActionButton floatAddButton;
@@ -130,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //member
     private StateManager stateManager = null;
-
 
     //service
     private SoundService soundService = null;
@@ -494,9 +475,14 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         DLog.v(CONSTANTS.LOG_LIFECYCLE, "onResume()");
         super.onResume();
-        stateManager.launchAppFirstTime();
-        refreshScreen(stateManager.getCurrentPlayItem());    //현재 화면으로 돌아온 경우 화면 갱신함
-        rescheduleTimerTask();
+        try{
+            stateManager.launchAppFirstTime();
+            refreshScreen(stateManager.getCurrentPlayItem());    //현재 화면으로 돌아온 경우 화면 갱신함
+            rescheduleTimerTask();
+        }
+        catch(NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     private void rescheduleTimerTask() {
@@ -787,13 +773,8 @@ public class MainActivity extends AppCompatActivity implements
         initSoundService(savedInstanceState);
         if(stateManager == null)
         {
-            if (savedInstanceState == null) {
-                stateManager = (StateManager) getApplicationContext();
-            } else {
-                stateManager = (StateManager) savedInstanceState.getSerializable(KEY_STATEMANAGER);
-            }
+            stateManager = (StateManager) getApplicationContext();
         }
-
     }
 
     //최초 실행시점에서 soundservice가 널 일때만 생성.
