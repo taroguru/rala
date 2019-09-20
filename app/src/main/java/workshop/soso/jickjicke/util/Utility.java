@@ -168,14 +168,19 @@ public class Utility {
         return outputString;
     }
 
-    // ##:##.#
+    // ##:##.##
     public static String changeMSecToMSec(int totalMSec) {
+        return changeMSecToMSec(totalMSec, 2);
+    }
+
+    public static String changeMSecToMSec(int totalMSec, int pointCount) {
 
         int min = totalMSec / (1000 * 60);
         int sec = (totalMSec - min * (1000 * 60)) / 1000;
         int msec = (totalMSec - (min * (1000 * 60) + sec * 1000)) / 100;
 
-        String mSec = String.format("%02d:%02d.%02d", min, sec, msec);
+        String formatString ="%02d:%02d.%0"+String.valueOf(pointCount)+"d";
+        String mSec = String.format(formatString, min, sec, msec);
 
         return mSec;
     }
