@@ -58,5 +58,5 @@ public class CONSTANTS {
 
     public static final String LOG_LIFECYCLE = "ANDROID_LIFE";
     public static final String TAG_NOTIFICATION = "JICKJICK.NOTIFICATION";
-
+    public static final String TAG_SEEKTOUCHSTATE = "SEEK_TOUCH_STATE";
 }

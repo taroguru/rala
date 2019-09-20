@@ -168,16 +168,18 @@ public class Utility {
         return outputString;
     }
 
-    // ##:##.#
+    // ##:##.##
     public static String changeMSecToMSec(int totalMSec) {
 
         int min = totalMSec / (1000 * 60);
         int sec = (totalMSec - min * (1000 * 60)) / 1000;
-        int msec = (totalMSec - (min * (1000 * 60) + sec * 1000)) / 100;
+        int mSec = (totalMSec - (min * (1000 * 60) + sec * 1000)) / 10;
 
-        String mSec = String.format("%02d:%02d.%02d", min, sec, msec);
-
-        return mSec;
+        String formatString;
+        formatString = "%02d:%02d.%02d";
+        String formattedMSec = String.format(formatString, min, sec, mSec);
+        DLog.v(CONSTANTS.TAG_SEEKTOUCHSTATE, formatString+" "+formattedMSec);
+        return formattedMSec;
     }
 
     public static void launchAppFirstTime(Context context) {

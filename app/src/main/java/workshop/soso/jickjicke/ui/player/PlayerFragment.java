@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +16,11 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -82,6 +86,11 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     //UIs
     private PlayerSeekbar playingSeekBarFirst = null;
     private PlayerSeekbar playingSeekBarSecond = null;
+
+    enum SeekBarState{ IDLE, TOUCHED};
+    SeekBarState touchState = SeekBarState.IDLE;
+    Toast durationToast;
+    TextView durationText;
 
     private TextView textCurrentTime;
     private TextView textTotalTime;
@@ -304,25 +313,29 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
         buttonStop = rootView.findViewById(R.id.ButtonStop);
         buttonStop.setOnClickListener(buttonSoundControlListener);
-//        buttonAdd = (CardView) rootView.findViewById(R.id.ButtonAdd);
-//        buttonAdd.setOnClickListener(buttonSoundControlListner);
-
 
         textCurrentTime = rootView.findViewById(R.id.textCurrentMin);
         textTotalTime = rootView.findViewById(R.id.textTotalMin);
 
-
         SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener() {
+
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if(touchState == SeekBarState.TOUCHED)
+                    showDurationToast(seekBar, i);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
+                DLog.v(CONSTANTS.TAG_SEEKTOUCHSTATE, "touched");
+                touchState = SeekBarState.TOUCHED;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                DLog.v(CONSTANTS.TAG_SEEKTOUCHSTATE, "idle");
+                touchState = SeekBarState.IDLE;
+
                 int position = seekBar.getProgress();
                 if (playSoundListener != null) {
                     PlayerSeekbar pSeekBar = (PlayerSeekbar) seekBar;
@@ -342,6 +355,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
         playingSeekBarSecond.setSecondHalf(true);
         playingSeekBarSecond.setOnSeekBarChangeListener(seekBarListener);
 
+        createDurationToast();
         //화면 갱신 시작
         if (msgHandler == null) {
             msgHandler = new MessageHandler();
@@ -684,7 +698,8 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     }
 
     public void refreshProgress() {
-        if (playSoundListener != null){// && isStarted()) {
+
+        if (touchState == SeekBarState.IDLE && playSoundListener != null){// && isStarted()) {
             int currentPosition = playSoundListener.onGetCurrentPosition();
             int max = playingSeekBarFirst.getMax();
             if (currentPosition <= max) {
@@ -750,6 +765,7 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
                 break;
 
             case R.id.ButtonPlay:
+
                 if (playSoundListener != null) {
                     if (playSoundListener.onIsNowPlaying()) {
                         //1. 동작
@@ -794,7 +810,6 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
         return 1;
     }
 
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         DLog.v(CONSTANTS.LOG_LIFECYCLE, "onSaveInstanceState()");
@@ -802,5 +817,43 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
         outState.putSerializable(KEY_ABREPEATFORNEW, abRepeatForNew);
     }
 
+    /**
+     *
+     * @param duration  millie seconds
+     */
+    public void showDurationToast(SeekBar seekbar, int duration) {
+        try{
+            if( playSoundListener.onGetPlayerState() == MediaPlayerStateMachine.State.PAUSED ||
+                    playSoundListener.onGetPlayerState() == MediaPlayerStateMachine.State.STARTED) {
+                int realDuration  = 0;
 
+                PlayerSeekbar pSeekBar = (PlayerSeekbar) seekbar;
+                if (!pSeekBar.isSecondHalf()) {
+                    realDuration = duration;
+                } else {
+                    realDuration = seekbar.getMax() + duration;
+                }
+
+                durationText.setText( Utility.changeMSecToMSec(realDuration) );
+                durationToast.setView(durationText);
+                durationToast.setDuration(Toast.LENGTH_SHORT);
+                durationToast.show();
+            }
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    private void createDurationToast()
+    {
+        durationToast = new Toast(getContext());
+        durationToast.setGravity(Gravity.TOP, 0, 0);
+
+        durationText = new TextView(getContext());
+        durationText.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_corner));
+        durationText.setTextSize(40);
+        durationText.setPadding(50, 50, 50, 50);
+    }
 }

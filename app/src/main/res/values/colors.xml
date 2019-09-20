@@ -20,6 +20,7 @@
 
     <!-- player color-->
     <color name="player_background">#ffe6e6e6</color>
+    <color name="duration_toast_color">#88e6e6e6</color>
     <!-- normal, press, activate -->
     <color name="player_button_normal">@color/signature_color</color>
     <color name="player_button_text_color">@color/textblack</color>
