@@ -4,17 +4,7 @@
     android:id="@+id/notification_player_normal"
     android:layout_width="match_parent"
     android:layout_height="40dp">
-    <!--
-    <ImageView
-        android:id="@+id/imgAlbum"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="gone"
-        />
-    -->
+
     <TextView
         android:id="@+id/textTitle"
         android:layout_width="170dp"
@@ -49,13 +39,5 @@
         android:layout_alignParentRight="true"
         app:srcCompat="@drawable/ic_skip_next_black_24dp"
         style="@style/notificationButton"/>
-    <!--
-    <ImageButton
-        android:id="@+id/buttonExit"
-        android:layout_alignParentRight="true"
-        app:srcCompat="@drawable/ic_close_black_24dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        style="@style/notificationExitButton"/>
--->
+
 </RelativeLayout>

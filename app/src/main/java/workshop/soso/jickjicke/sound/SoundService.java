@@ -311,18 +311,20 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 else if (action.equals(ACTION.ChangePlayerState)) {
                     MediaPlayerStateMachine.State state = (MediaPlayerStateMachine.State) intent.getSerializableExtra(ACTION.State);
                     DLog.v(CONSTANTS.TAG_NOTIFICATION, state.toString());
-                    if(state == MediaPlayerStateMachine.State.END){
+                    if(state == MediaPlayerStateMachine.State.END || state == MediaPlayerStateMachine.State.IDLE ){
                         DLog.v(CONSTANTS.TAG_NOTIFICATION, "goodbye notification");  // 종료 시점에 notification을 보냅시다
                         notificationCancel();
                     } else if (state == MediaPlayerStateMachine.State.ERROR ||
-                            state == MediaPlayerStateMachine.State.IDLE || state == MediaPlayerStateMachine.State.INITIALIZED ||
+                             state == MediaPlayerStateMachine.State.INITIALIZED ||
                             state == MediaPlayerStateMachine.State.PREPARING || state == MediaPlayerStateMachine.State.PREPARED) {
                         DLog.v(CONSTANTS.TAG_NOTIFICATION, "don't refresh noti");   //요기가 범인.
                     } else if (Utility.isPlayButtonState(state)) {
                         DLog.v(CONSTANTS.TAG_NOTIFICATION, "notification icon : PLAY");
+                        mBuilder.setOngoing(false);
                         changeNotiPlayButtonImage(R.drawable.ic_play_noti_24dp);
                     } else {
                         DLog.v(CONSTANTS.TAG_NOTIFICATION, "notification icon : PAUSE");
+                        mBuilder.setOngoing(true);
                         changeNotiPlayButtonImage(R.drawable.ic_pause_black_24dp);
                     }
                 } else if (action.equals(ACTION.OnABRepeatMode)) {
@@ -385,7 +387,11 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
     private void notificationCancel()
     {
-        mNotificationManager.cancel(CONSTANTS.NOTIFICATIONID);
+        try{
+            mNotificationManager.cancel(CONSTANTS.NOTIFICATIONID);
+        }catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
     private void stopSoundService()
     {
@@ -530,7 +536,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         notificationView.setOnClickPendingIntent(R.id.buttonPrevPlayItem, playPrevPlayItem);
         notificationView.setOnClickPendingIntent(R.id.buttonPlay, playPlay);
         notificationView.setOnClickPendingIntent(R.id.buttonNextPlayItem, playNextPlayItem);
-//      notificationView.setOnClickPendingIntent(R.id.buttonExit, intentExit);  //종료버튼
 
         // Creates an explicit intent for an Activity in your app
         PendingIntent pendingIntent = makePendingIntent();
@@ -1117,38 +1122,4 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         return position;
     }
 
-
-
-//api >= 23
-//
-//    public boolean setSpeed(float speed)
-//    {
-//        return mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
-//    }
-
-    /*
-
-The MediaPlayer does not provide this feature but SoundPool has this functionality. The SoundPool class has a method called setRate (int streamID, float rate). If you are interested in the API have a look here.
-
-This Snippet will work.
-
- float playbackSpeed=1.5f;
- SoundPool soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 100);
-
- soundId = soundPool.load(Environment.getExternalStorageDirectory()
-                         + "/sample.3gp", 1);
- AudioManager mgr = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
- final float volume = mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-
- soundPool.setOnLoadCompleteListener(new OnLoadCompleteListener()
- {
-     @Override
-     public void onLoadComplete(SoundPool arg0, int arg1, int arg2)
-     {
-         soundPool.play(soundId, volume, volume, 1, 0, playbackSpeed);
-     }
- });
-
-*
-* */
 }
