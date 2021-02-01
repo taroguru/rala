@@ -1,5 +1,6 @@
 package workshop.soso.jickjicke;
 
+import android.os.Bundle;
 import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,11 +12,9 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.Serializable;
@@ -47,33 +46,17 @@ public class StateManager extends Application implements Serializable {
     public static final int CurrentPlaylistPosition = 0;
 
 
-    private static GoogleAnalytics sAnalytics;
-    private static Tracker sTracker;
-
-    synchronized public Tracker getDefaultTracker() {
-        // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-        if (sTracker == null) {
-            sTracker = sAnalytics.newTracker(R.xml.global_tracker);
-            sTracker.enableExceptionReporting(true);
-            sTracker.enableAdvertisingIdCollection(true);
-            sTracker.enableAutoActivityTracking(true);
-
-        }
-
-        return sTracker;
-    }
+    private static FirebaseAnalytics firebaseAnalytics;
 
     public void sendEventGoogleAnalytics(String title, String message) {
-        if (sTracker == null) {
-            try {
-                sTracker = getDefaultTracker();
-                sTracker.send(new HitBuilders.EventBuilder()
-                        .setCategory(title).setAction(message)
-                        .build());
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
+        try {
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.CONTENT, message);
+            firebaseAnalytics.logEvent(title, bundle);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
+
     }
 
     private PlayerState playerState;
@@ -175,7 +158,7 @@ public class StateManager extends Application implements Serializable {
     public void onCreate() {
         super.onCreate();
         initMembers();
-        sAnalytics = GoogleAnalytics.getInstance(this);
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     private void initMembers() {

@@ -441,7 +441,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 } else    //stop state
                 {
                     StateManager stateManager = getStateManager(this);
-                    if (stateManager.hasPlayableItem()) {
+                    if (stateManager != null && stateManager.hasPlayableItem()) {
                         int playlistPosition = stateManager.getCurrentPlayListPosition();
                         int position = stateManager.getCurrentPosition();
                         onPlaySoundTrack(playlistPosition, position);

@@ -36,13 +36,12 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements OnPlaySoundListen
     private SoundService soundService = null;
     private Intent playIntent = null;
     private boolean soundServiceBound = false; //?
+
+    //firebase
+    private FirebaseAnalytics firebaseAnalytics;
 
     public FloatingActionButton getFloatingButton(){
         return floatAddButton;
@@ -376,9 +378,13 @@ public class MainActivity extends AppCompatActivity implements OnPlaySoundListen
                 changeSearchView(position);
             }
 
-            Tracker tracker = stateManager.getDefaultTracker();
-            tracker.setScreenName(CONSTANTS.screenName(position));
-            tracker.send(new HitBuilders.ScreenViewBuilder().build());
+            Bundle bundle = new Bundle();
+            //bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "ITEM_1");
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "ChangeScreen");
+            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "SwipeScreen");
+
+            firebaseAnalytics.logEvent(CONSTANTS.screenName(position) , bundle);
+
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -775,6 +781,7 @@ public class MainActivity extends AppCompatActivity implements OnPlaySoundListen
         {
             stateManager = (StateManager) getApplicationContext();
         }
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     //최초 실행시점에서 soundservice가 널 일때만 생성.

@@ -43,7 +43,8 @@ repositories {
 dependencies {
     ext {
         support_library_version = "1.0.0"
-        google_play_services_version = "16.0.4"
+        google_play_services_version = "17.0.0"
+        firebase_version = "26.3.0"
     }
 
     api fileTree(include: ["*.jar"], dir: "libs")
@@ -66,9 +67,10 @@ dependencies {
     implementation  "com.google.android.material:material:${support_library_version}"
     implementation  "androidx.vectordrawable:vectordrawable:${support_library_version}"
     implementation  "androidx.vectordrawable:vectordrawable-animated:${support_library_version}"
-    implementation  "com.google.firebase:firebase-core:${google_play_services_version}"
     implementation  "com.google.android.gms:play-services-analytics:${google_play_services_version}"
     implementation  "com.afollestad.material-dialogs:core:0.9.0.2"
+    implementation  platform("com.google.firebase:firebase-bom:${firebase_version}")
+    implementation 'com.google.firebase:firebase-analytics'
     testImplementation "junit:junit:4.12"
     androidTestImplementation "org.hamcrest:hamcrest-library:1.3"
     androidTestImplementation "androidx.annotation:annotation:${support_library_version}"
