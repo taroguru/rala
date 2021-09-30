@@ -416,7 +416,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
 
         try{
             if(intent == null) {
-                DLog.d(CONSTANTS.LOG_LIFECYCLE, "null intent");
+                DLog.d(CONSTANTS.LOG_LIFECYCLE, "Null intent is received");
                 return super.onStartCommand(intent, flags, startId);
             }
 
@@ -523,6 +523,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 notifyChangeNotification();
             }
         } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
             e.printStackTrace();
         }
     }

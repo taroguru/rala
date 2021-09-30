@@ -355,7 +355,6 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
         playingSeekBarSecond.setSecondHalf(true);
         playingSeekBarSecond.setOnSeekBarChangeListener(seekBarListener);
 
-        createDurationToast();
         //화면 갱신 시작
         if (msgHandler == null) {
             msgHandler = new MessageHandler();
@@ -833,6 +832,9 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
                 } else {
                     realDuration = seekbar.getMax() + duration;
                 }
+
+                if(durationText == null || durationToast == null)
+                    createDurationToast();
 
                 durationText.setText( Utility.changeMSecToMSec(realDuration) );
                 durationToast.setView(durationText);
