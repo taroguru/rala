@@ -410,56 +410,68 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
             DLog.d("MediaPlayer is already null");
         }
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-        DLog.d(CONSTANTS.LOG_LIFECYCLE, "onStartCommand() : " + action);
 
-        if(action == null || action.isEmpty())
-        {
-            DLog.v("Empty Action.");
-        }
-        else if(action.equals(ACTION.StartSoundService)){
-            DLog.v("Start Foreground Service");
-            startForegroundService();
-        }
-        else if (action.equals(ACTION.PLAY_PREV_PLAYITEM)) {
-            onPrevTrack();
-        } else if (action.equals(ACTION.PLAY_PREV_REPEAT)) {
-            DLog.v("play prev repeat. from notification");
-            onPlayPreviousABRepeat();
-        } else if (action.equals(ACTION.PLAY)) {
-            if (onIsNowPlaying()) {
-                //1. 동작
-                onPausePlayingMusic();
-                //2. 화면 제어
-                changeNotiPlayButtonImage(R.drawable.ic_play_noti_24dp);
-            } else {
-                if (onGetPlayerState() == MediaPlayerStateMachine.State.PAUSED) {
-                    onResumePausedMusic();
-                    changeNotiPlayButtonImage(R.drawable.ic_pause_black_24dp);
-                } else    //stop state
-                {
-                    StateManager stateManager = getStateManager(this);
-                    if (stateManager != null && stateManager.hasPlayableItem()) {
-                        int playlistPosition = stateManager.getCurrentPlayListPosition();
-                        int position = stateManager.getCurrentPosition();
-                        onPlaySoundTrack(playlistPosition, position);
-                        Utility.sendBroadcastPlayNewItem(this, playlistPosition, position);
+        try{
+            if(intent == null) {
+                DLog.d(CONSTANTS.LOG_LIFECYCLE, "null intent");
+                return super.onStartCommand(intent, flags, startId);
+            }
 
+            String action = intent.getAction();
+            DLog.d(CONSTANTS.LOG_LIFECYCLE, "onStartCommand() : " + action);
+
+            if(action == null || action.isEmpty())
+            {
+                DLog.v("Empty Action.");
+            }
+            else if(action.equals(ACTION.StartSoundService)){
+                DLog.v("Start Foreground Service");
+                startForegroundService();
+            }
+            else if (action.equals(ACTION.PLAY_PREV_PLAYITEM)) {
+                onPrevTrack();
+            } else if (action.equals(ACTION.PLAY_PREV_REPEAT)) {
+                DLog.v("play prev repeat. from notification");
+                onPlayPreviousABRepeat();
+            } else if (action.equals(ACTION.PLAY)) {
+                if (onIsNowPlaying()) {
+                    //1. 동작
+                    onPausePlayingMusic();
+                    //2. 화면 제어
+                    changeNotiPlayButtonImage(R.drawable.ic_play_noti_24dp);
+                } else {
+                    if (onGetPlayerState() == MediaPlayerStateMachine.State.PAUSED) {
+                        onResumePausedMusic();
                         changeNotiPlayButtonImage(R.drawable.ic_pause_black_24dp);
+                    } else    //stop state
+                    {
+                        StateManager stateManager = getStateManager(this);
+                        if (stateManager != null && stateManager.hasPlayableItem()) {
+                            int playlistPosition = stateManager.getCurrentPlayListPosition();
+                            int position = stateManager.getCurrentPosition();
+                            onPlaySoundTrack(playlistPosition, position);
+                            Utility.sendBroadcastPlayNewItem(this, playlistPosition, position);
+
+                            changeNotiPlayButtonImage(R.drawable.ic_pause_black_24dp);
+                        }
                     }
                 }
+            } else if (action.equals(ACTION.PLAY_NEXT_REPEAT)) {
+                onPlayNextABRepeat();
+            } else if (action.equals(ACTION.PLAY_NEXT_PLAYITEM)) {
+                onNextTrack();
+            } else if (action.equals(ACTION.EXIT)) {
+                DLog.v(CONSTANTS.LOG_LIFECYCLE, "ACTION.EXIT");
+                stopSoundService();
+            } else {
+                DLog.v("unknown action : " + action);
             }
-        } else if (action.equals(ACTION.PLAY_NEXT_REPEAT)) {
-            onPlayNextABRepeat();
-        } else if (action.equals(ACTION.PLAY_NEXT_PLAYITEM)) {
-            onNextTrack();
-        } else if (action.equals(ACTION.EXIT)) {
-            DLog.v(CONSTANTS.LOG_LIFECYCLE, "ACTION.EXIT");
-            stopSoundService();
-        } else {
-            DLog.v("unknown action : " + action);
+        }catch(NullPointerException e){
+
+            super.onStartCommand(intent, flags, startId);
         }
         return START_STICKY;
     }
