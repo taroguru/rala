@@ -222,6 +222,16 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     @Override
+    public boolean onChangePlaybackSpeed(float speed) {
+        return mediaPlayer.setSpeed(speed);
+    }
+
+    @Override
+    public float onGetPlaybackSpeed() {
+        return mediaPlayer.getSpeed();
+    }
+
+    @Override
     public boolean onSeekTo(int position) {
         return seekTo(position);
     }

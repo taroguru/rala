@@ -2,6 +2,8 @@ package workshop.soso.jickjicke.sound;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.media.PlaybackParams;
+import android.os.Build;
 
 import java.io.IOException;
 
@@ -134,5 +136,47 @@ public class StateSoundPlayer extends MediaPlayer {
         }
 
         return duration;
+    }
+
+    /**
+     * 플레이어 속도 설정
+     * @param speed
+     * @return
+     */
+    public boolean setSpeed(float speed){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            try {
+                //기존 미디어 플레이어의 파라미터(playbackparams)를 가져와서
+                PlaybackParams params = getPlaybackParams();
+                //속도만 변경할 다음
+                params.setSpeed(speed);
+                //미디어 플레이어에 다시 설정해주면 속도가 변한다.
+                setPlaybackParams(params);
+                return true;
+            } catch (Exception e) {
+                //하지만 Exception이 뜬다면 어떨까!?!?!
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 플레이 속도 획득
+     * @return 플레이 속도
+     */
+    public float getSpeed() {
+        float speed = 1.0f;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            try {
+                PlaybackParams params = getPlaybackParams();
+                speed = params.getSpeed();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return speed;
     }
 }

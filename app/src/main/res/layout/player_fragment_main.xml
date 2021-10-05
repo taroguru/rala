@@ -97,11 +97,13 @@
             android:textColor="@color/player_button_text_color"
             card_view:cardBackgroundColor="@color/white"
             card_view:cardCornerRadius="0dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:weightSum="3">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -109,43 +111,52 @@
                     android:orientation="horizontal"
                     android:paddingTop="5dp"
                     android:weightSum="3">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2">
+
                         <androidx.appcompat.widget.AppCompatTextView
                             style="@style/SwitchLabel"
                             android:text="@string/loop" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center">
+
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/loopsiwtch"
                             style="@style/SwitchRight" />
                     </LinearLayout>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:orientation="horizontal"
                     android:weightSum="3">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2">
+
                         <androidx.appcompat.widget.AppCompatTextView
                             style="@style/SwitchLabel"
                             android:text="@string/shuffle" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center">
+
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/shuffleSiwtch"
                             style="@style/SwitchRight" />
@@ -159,23 +170,26 @@
                     android:orientation="horizontal"
                     android:paddingBottom="5dp"
                     android:weightSum="3">
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2">
+
                         <androidx.appcompat.widget.AppCompatTextView
                             style="@style/SwitchLabel"
                             android:text="@string/abrepeat" />
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center">
+
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/repeatsiwtch"
-                            style="@style/SwitchRight"
-                             />
+                            style="@style/SwitchRight" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -282,11 +296,12 @@
         android:layout_height="0dp"
         android:layout_margin="0dp"
         android:layout_weight="2"
-        android:weightSum="2">
+        android:weightSum="3">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/ButtonPrevious"
             style="@style/PlayerButton"
+            android:layout_weight="1"
             card_view:cardBackgroundColor="@color/white">
 
             <LinearLayout
@@ -313,6 +328,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/ButtonNext"
             style="@style/PlayerButton"
+            android:layout_weight="1"
             card_view:cardBackgroundColor="@color/white">
 
             <LinearLayout
@@ -336,9 +352,78 @@
 
         </androidx.cardview.widget.CardView>
 
+        <androidx.cardview.widget.CardView
+            android:id="@+id/ButtonUpDown"
+            style="@style/PlayerButton"
+            android:layout_weight="1"
+            card_view:cardBackgroundColor="@color/white"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:weightSum="2">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/ButtonUp"
+                    style="@style/PlayerButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    card_view:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/ic_skip_next_black_48dp" />
+
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/ButtonDown"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    card_view:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/ic_skip_previous_black_48dp" />
+
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
 
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="match_parent"
