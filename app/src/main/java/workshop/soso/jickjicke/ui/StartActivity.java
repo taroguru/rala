@@ -34,7 +34,6 @@ public class StartActivity extends AppCompatActivity {
     private List<TextView> titleTextList;
     private TextView underLine;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,41 +53,50 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestReadPhoneState() {
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         if(permissionCheck== PackageManager.PERMISSION_DENIED){
             requestPermissions(
-                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                    new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     Permissions.READ_PHONE_STATE);
         }else {
             hasReadPhoneState = true;
             if(hasExtReadPermission && hasExtWritePermission){
-                startMainActivity();
+                ;
             }
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestExtRead()
     {
-
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        DLog.d("requestExtReadPermission");
+        //request audio file read permission
+        String permissionStringForRead="";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        {
+            permissionStringForRead = Manifest.permission.READ_MEDIA_AUDIO;
+        }
+        else{
+            permissionStringForRead = Manifest.permission.READ_EXTERNAL_STORAGE;
+        }
+        int permissionCheck = ContextCompat.checkSelfPermission(this, permissionStringForRead);
 
         if(permissionCheck== PackageManager.PERMISSION_DENIED){
+            //permissoin denied
+
             requestPermissions(
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    new String[]{permissionStringForRead},
                     Permissions.EXTERNAL_READ);
-        }else {
+        } else {
             hasExtReadPermission = true;
             DLog.v("has external disk read permission");
-            requestExtWrite();
+            startMainActivity();
+            //requestExtWrite();
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void requestExtWrite()
     {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -164,29 +172,26 @@ public class StartActivity extends AppCompatActivity {
         }, (long)(CONSTANTS.DURATION_START_ACTIVITY_TITLE_BOUNCE*5));
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode)
-        {
-            case Permissions.EXTERNAL_READ:
-            {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case Permissions.EXTERNAL_READ: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    hasExtReadPermission=true;
+                    hasExtReadPermission = true;
                     requestExtWrite();
                 } else {
                     finishAffinity();
                 }
             }
-                break;
-            case Permissions.EXTERNAL_WRITE:
-            {
+            break;
+            case Permissions.EXTERNAL_WRITE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    hasExtWritePermission =true;
+                    hasExtWritePermission = true;
                     requestReadPhoneState();
                 } else {
                     finishAffinity();
@@ -198,14 +203,13 @@ public class StartActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    hasReadPhoneState=true;
+                    hasReadPhoneState = true;
 
                 } else {
                     ShortTask.showSnack(this, R.string.cannotPauseWhenIncoming);
                 }
 
-                if(hasExtReadPermission && hasExtWritePermission )
-                {
+                if (hasExtReadPermission && hasExtWritePermission) {
                     startMainActivity();
                 }
                 break;

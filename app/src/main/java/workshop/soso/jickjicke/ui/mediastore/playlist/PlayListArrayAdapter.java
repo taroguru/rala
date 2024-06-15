@@ -137,44 +137,38 @@ public class PlayListArrayAdapter extends AbstractMediaArrayAdapter implements O
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.delete_playitem: {
-                        String msg = String.format("remove playitem(%d).", position) + playitem.toString();
-                        DLog.v(msg);
+                if (item.getItemId() == R.id.delete_playitem) {
+                    String msg = String.format("remove playitem(%d).", position) + playitem.toString();
+                    DLog.v(msg);
 
-                        String playItemName = playitem.getName();
-                        int count = DBHelper.deletePlayItem(context, playitem.getPlaylistId(), playitem.getId());
-                        if (count > 0)//실제로 삭제 수행시
-                        {
-                            //화면 표시
-                            String sentence = context.getString(R.string.playitem_is_removed);
-                            sentence = sentence.replace("#_#_#", playItemName);
-                            ShortTask.showSnack(context, sentence);
+                    String playItemName = playitem.getName();
+                    int count = DBHelper.deletePlayItem(context, playitem.getPlaylistId(), playitem.getId());
+                    if (count > 0)//실제로 삭제 수행시
+                    {
+                        //화면 표시
+                        String sentence = context.getString(R.string.playitem_is_removed);
+                        sentence = sentence.replace("#_#_#", playItemName);
+                        ShortTask.showSnack(context, sentence);
 
-                            //adapter내부 index다시 계산
-                            recalculateIndex(position, ITEMTYPE);
+                        //adapter내부 index다시 계산
+                        recalculateIndex(position, ITEMTYPE);
 
-                            //update statemanager
-                            PlayList playlistInEntire = Utility.getPlayList(context, (long) playitem.getPlaylistId());
-                            playlistInEntire.getItemlist().remove(playitem);
+                        //update statemanager
+                        PlayList playlistInEntire = Utility.getPlayList(context, (long) playitem.getPlaylistId());
+                        playlistInEntire.getItemlist().remove(playitem);
 
-                            //row정리.
-                            removeRow(clickitem);
-                            notifyItemRemoved(position);
-                            notifyItemRangeChanged(position, getmRows().size());
+                        //row정리.
+                        removeRow(clickitem);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, getmRows().size());
 
-                            if (isEmpty()) {
-                                playlistFragment.onDataSetChanged();    //empty text 표현 위해서.
-                            }
-
-                        } else {
-                            DLog.e("playitem remove failed! PLAYLIST ID : " + playitem.getPlaylistId() + ", playitem id : " + playitem.getId());
+                        if (isEmpty()) {
+                            playlistFragment.onDataSetChanged();    //empty text 표현 위해서.
                         }
-                    }
 
-                    break;
-                    default:
-                        break;
+                    } else {
+                        DLog.e("playitem remove failed! PLAYLIST ID : " + playitem.getPlaylistId() + ", playitem id : " + playitem.getId());
+                    }
                 }
                 return false;
             }
@@ -216,41 +210,35 @@ public class PlayListArrayAdapter extends AbstractMediaArrayAdapter implements O
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.play_playlist: {
-                        CurrentPlaylistReseter.resetCurrentPlaylist(context, playlist);
+                int itemId = item.getItemId();
+                if (itemId == R.id.play_playlist) {
+                    CurrentPlaylistReseter.resetCurrentPlaylist(context, playlist);
 //                        String sentence = getContext().getString(R.string.playlist_is_playing);
 //                        sentence = sentence.replace("##", playlist.getName());
 //
 //                        Snackbar.make(view, sentence, Snackbar.LENGTH_LONG).show();
+                } else if (itemId == R.id.delete_playlist) {
+                    PlayList deletingList = playlist;
+                    String playlistName = deletingList.getName();
+                    int count = DBHelper.deletePlaylist(context, deletingList.getId());
+
+                    String sentence = context.getString(R.string.playlist_is_removed);
+                    sentence = sentence.replace(new String("playlistname"), playlistName);
+                    //adapter내부 index다시 계산
+                    recalculateIndex(position, PLAYLISTTYPE);
+
+                    //update statemanager
+                    Utility.getEntirePlayList(context).remove(deletingList);
+                    ShortTask.showSnack(context, sentence);
+
+                    getmRows().remove(clickedItem);
+
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, getmRows().size());    //index 갱신
+
+                    if (isEmpty()) {
+                        playlistFragment.onDataSetChanged();    //empty text 표현 위해서.
                     }
-                    break;
-                    case R.id.delete_playlist: {
-                        PlayList deletingList = playlist;
-                        String playlistName = deletingList.getName();
-                        int count = DBHelper.deletePlaylist(context, deletingList.getId());
-
-                        String sentence = context.getString(R.string.playlist_is_removed);
-                        sentence = sentence.replace(new String("playlistname"), playlistName);
-                        //adapter내부 index다시 계산
-                        recalculateIndex(position, PLAYLISTTYPE);
-
-                        //update statemanager
-                        Utility.getEntirePlayList(context).remove(deletingList);
-                        ShortTask.showSnack(context, sentence);
-
-                        getmRows().remove(clickedItem);
-
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, getmRows().size());    //index 갱신
-
-                        if (isEmpty()) {
-                            playlistFragment.onDataSetChanged();    //empty text 표현 위해서.
-                        }
-                    }
-                    break;
-                    default:
-                        break;
                 }
 
                 return false;

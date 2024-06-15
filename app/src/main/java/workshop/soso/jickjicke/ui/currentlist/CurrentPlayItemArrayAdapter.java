@@ -127,25 +127,14 @@ public class CurrentPlayItemArrayAdapter extends AbstractMediaArrayAdapter imple
 		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				switch(item.getItemId())
-				{
-					case R.id.menu_delete_from_currentplaylist:
-					{
-						removePlayItem(position, context, playItem);
-					}
-					break;
-					case R.id.menu_add_playlist:
-					{
-						String msg = String.format("add button clicked");
-						DLog.v(msg);
-						PlayListHelper.showAudioToPlaylistDialog(context, playItem.getAudio());
-					}
-					break;
-
-
-					default:
-						break;
-				}
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_delete_from_currentplaylist) {
+                    removePlayItem(position, context, playItem);
+                } else if (itemId == R.id.menu_add_playlist) {
+                    String msg = String.format("add button clicked");
+                    DLog.v(msg);
+                    PlayListHelper.showAudioToPlaylistDialog(context, playItem.getAudio());
+                }
 				return false;
 			}
 		});

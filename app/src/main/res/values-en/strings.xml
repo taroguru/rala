@@ -64,4 +64,6 @@
     <string name="channel_description">Rala Notification Player</string>
     <string name="noti_player_name">Rala Notification Player</string>
     <string name="shuffle">Random</string>
+    <string name="hint_viewpager">View Pager</string>
+    <string name="hint_tab">tab layout</string>
 </resources>

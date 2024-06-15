@@ -94,37 +94,28 @@ public class ABRepeatListArrayAdapter extends AbstractMediaArrayAdapter<ABRepeat
 		((MainActivity)(context)).getMenuInflater().inflate(R.menu.abrepeat_item_popup, popup.getMenu());
 
 		popup.setOnMenuItemClickListener(item -> {
-            switch(item.getItemId())
-            {
-                case R.id.delete_abrepeat:
-                {
-                    String msg = String.format("remove abrepeat(%d)", childPosition);
-                    DLog.v(msg);
-                    ABRepeatList abRepeatList = Utility.getABRepeatList(getContext());
-                    ABRepeat deletingItem = (ABRepeat) abRepeatList.getItemlist().get(childPosition);
-                    String abrepeatName = deletingItem.getName();
-                    int count = DBHelper.deleteABRepeat(getContext(), deletingItem);
+            if (item.getItemId() == R.id.delete_abrepeat) {
+                String msg = String.format("remove abrepeat(%d)", childPosition);
+                DLog.v(msg);
+                ABRepeatList abRepeatList = Utility.getABRepeatList(getContext());
+                ABRepeat deletingItem = (ABRepeat) abRepeatList.getItemlist().get(childPosition);
+                String abrepeatName = deletingItem.getName();
+                int count = DBHelper.deleteABRepeat(getContext(), deletingItem);
 
-                    String sentence = getContext().getString(R.string.playitem_is_removed);
-                    sentence = sentence.replace("#_#_#", abrepeatName);
-                    //update statemanager
-                    abRepeatList.remove(childPosition, getContext());
+                String sentence = getContext().getString(R.string.playitem_is_removed);
+                sentence = sentence.replace("#_#_#", abrepeatName);
+                //update statemanager
+                abRepeatList.remove(childPosition, getContext());
 
-                    getmRows().remove(childPosition);
-                    notifyItemRemoved(childPosition);
-                    notifyItemRangeChanged(childPosition, getmRows().size());
+                getmRows().remove(childPosition);
+                notifyItemRemoved(childPosition);
+                notifyItemRangeChanged(childPosition, getmRows().size());
 //						notifyDataSetChanged();
 
-                    if(getCount() == 0)
-                    {
-                        getABRepeatFragment().onDataSetChanged();
-                    }
-					ShortTask.showSnack(context, sentence);
+                if (getCount() == 0) {
+                    getABRepeatFragment().onDataSetChanged();
                 }
-                break;
-
-                default:
-                    break;
+                ShortTask.showSnack(context, sentence);
             }
             return false;
         });

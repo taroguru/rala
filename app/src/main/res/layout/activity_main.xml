@@ -38,14 +38,17 @@
                 app:tabPaddingBottom="0dp"
                 app:tabPaddingEnd="0dp"
                 app:tabPaddingStart="0dp"
-                app:tabPaddingTop="0dp" />
+                app:tabPaddingTop="0dp"
+                android:contentDescription="@string/hint_tab"/>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:contentDescription="@string/hint_viewpager"
+            />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
@@ -55,22 +58,26 @@
             app:layout_anchorGravity="center"
             app:layout_anchor="@+id/bottomPlayerAppBar"
             android:layout_alignWithParentIfMissing="true"
-            app:srcCompat="@drawable/ic_search_white_30dp" />
+            app:srcCompat="@drawable/ic_search_white_30dp"
+            android:contentDescription="@string/search"
+            />
 
         <com.google.android.material.bottomappbar.BottomAppBar
             android:id="@+id/bottomPlayerAppBar"
-            style="@style/Widget.MaterialComponents.BottomAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:fabAlignmentMode="center"
             app:backgroundTint="@color/signature_color_accent"
-            app:hideOnScroll="true">
+            app:hideOnScroll="true"
+            >
 
             <RelativeLayout
                 android:id="@+id/bottomPlayerRelativeLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"></RelativeLayout>
+                android:layout_height="match_parent">
+
+            </RelativeLayout>
         </com.google.android.material.bottomappbar.BottomAppBar>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

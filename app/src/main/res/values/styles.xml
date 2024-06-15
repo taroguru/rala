@@ -1,7 +1,7 @@
 
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Base" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your theme here.  <item name="colorPrimary">#3F51B5</item>-->
         <item name="colorPrimary">@color/white</item>
         <!-- Light Indigo  <item name="colorPrimaryDark">#3949AB</item> -->
@@ -92,7 +92,7 @@
         <item name="android:clickable">true</item>
         <item name="android:stateListAnimator">@drawable/listitem_selector</item>
         <item name="cardElevation">1dp</item>
-        <item name=":cardBackgroundColor">@color/child_item_color</item>
+        <item name="cardBackgroundColor">@color/child_item_color</item>
         <item name="android:textColor">@color/player_button_text_color</item>
         <item name="cardCornerRadius">0dp</item>
     </style>

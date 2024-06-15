@@ -243,14 +243,10 @@ public class MainActivity extends AppCompatActivity implements OnPlaySoundListen
                 DLog.d("DEBUG!", stateManager.toString());
 
                 int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.menu_go_to_developer:
-                        Utility.showDeveloperPage(getApplicationContext());
-                        break;
-                    case R.id.menu_go_to_google_play:
-                        Utility.showMarket(getApplicationContext());
-                        break;
-
+                if (id == R.id.menu_go_to_developer) {
+                    Utility.showDeveloperPage(getApplicationContext());
+                } else if (id == R.id.menu_go_to_google_play) {
+                    Utility.showMarket(getApplicationContext());
                 }
                 // Closing drawer on item click
                 mDrawerLayout.closeDrawers();

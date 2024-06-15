@@ -151,20 +151,11 @@ public class MediaArrayAdapterByFolder extends AbstractMediaArrayAdapter {
 		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				switch(item.getItemId())
-				{
-					case R.id.menu_add:
-					{
-						String msg = String.format("add button clicked");
-						DLog.v(msg);
-						PlayListHelper.showAudioToPlaylistDialog(getContext(), audio);
-					}
-					break;
-
-
-					default:
-						break;
-				}
+                if (item.getItemId() == R.id.menu_add) {
+                    String msg = String.format("add button clicked");
+                    DLog.v(msg);
+                    PlayListHelper.showAudioToPlaylistDialog(getContext(), audio);
+                }
 				return false;
 			}
 		});
@@ -183,24 +174,16 @@ public class MediaArrayAdapterByFolder extends AbstractMediaArrayAdapter {
 		popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
-				switch(item.getItemId())
-				{
-					case R.id.menu_play:
-					{
-						String msg = String.format("folder play button clicked");
-						DLog.v(msg);
-						CurrentPlaylistReseter.resetCurrentPlaylist(getContext(), audioFolder.getAudioList());
+                if (item.getItemId() == R.id.menu_play) {
+                    String msg = String.format("folder play button clicked");
+                    DLog.v(msg);
+                    CurrentPlaylistReseter.resetCurrentPlaylist(getContext(), audioFolder.getAudioList());
 
-						String sentence = getContext().getString(R.string.folder_is_playing);
-						sentence = sentence.replace("#_#_#", audioFolder.getName());
+                    String sentence = getContext().getString(R.string.folder_is_playing);
+                    sentence = sentence.replace("#_#_#", audioFolder.getName());
 
-						ShortTask.showSnack(getContext(), sentence);
-					}
-					break;
-
-					default:
-						break;
-				}
+                    ShortTask.showSnack(getContext(), sentence);
+                }
 				return false;
 			}
 		});

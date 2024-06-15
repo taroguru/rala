@@ -25,6 +25,7 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -411,6 +412,9 @@ public class Utility {
         catch(RuntimeException exception)
         {
             DLog.v(String.format("%s = %s", filePath, exception.toString()));
+        }
+        catch(IOException ioException) {
+            DLog.v(String.format("%s = %s", filePath, ioException.toString()));
         }
 
 

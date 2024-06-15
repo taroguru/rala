@@ -599,7 +599,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     private PendingIntent makePendingIntent(String action) {
         Intent pendingIntent = new Intent(this, SoundService.class);
         pendingIntent.setAction(action);
-        return PendingIntent.getService(this, 0, pendingIntent, 0);
+        return PendingIntent.getService(this, 0, pendingIntent,
+                PendingIntent.FLAG_IMMUTABLE);
     }
 
 
@@ -607,7 +608,8 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         Intent pendingIntent = new Intent(this, SoundService.class);
         pendingIntent.setAction(action);
         return PendingIntent.getService(this, (int)
-                System.currentTimeMillis(), pendingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                System.currentTimeMillis(), pendingIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
 
@@ -621,7 +623,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         resultPendingIntent =
                 stackBuilder.getPendingIntent(
                         0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 );
         return resultPendingIntent;
     }

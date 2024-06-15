@@ -64,4 +64,6 @@
     <string name="channel_description">랄라 알림 플레이어</string>
     <string name="noti_player_name">랄라 알림 플레이어</string>
     <string name="shuffle">랜덤재생</string>
+    <string name="hint_viewpager">음악 재생 화면</string>
+    <string name="hint_tab">탭 레이아웃</string>
 </resources>

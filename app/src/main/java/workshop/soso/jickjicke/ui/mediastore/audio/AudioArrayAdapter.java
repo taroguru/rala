@@ -1,5 +1,6 @@
 package workshop.soso.jickjicke.ui.mediastore.audio;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,6 +71,7 @@ public class AudioArrayAdapter extends AbstractMediaArrayAdapter {
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     public void showChildPopupMenu(final View view, final Audio audio)
     {
         final Context context = getContext();
@@ -78,18 +80,11 @@ public class AudioArrayAdapter extends AbstractMediaArrayAdapter {
         ((MainActivity)(context)).getMenuInflater().inflate(R.menu.media_audio_popup, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
-            switch(item.getItemId())
-            {
-                case R.id.menu_add:
-                {
-                    String msg = String.format("add button clicked");
-                    DLog.v(msg);
-                    PlayListHelper.showAudioToPlaylistDialog(getContext(), audio);
-                }
-                break;
-
-                default:
-                    break;
+            final int itemId = item.getItemId();
+            if (itemId == R.id.menu_add) {
+                String msg = String.format("add button clicked");
+                DLog.v(msg);
+                PlayListHelper.showAudioToPlaylistDialog(getContext(), audio);
             }
             return false;
         });

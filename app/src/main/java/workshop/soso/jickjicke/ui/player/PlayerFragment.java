@@ -385,26 +385,21 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
 
     private void changedSwitch(CompoundButton buttonView, boolean isChecked) {
         int id = buttonView.getId();
-        switch (id) {
-            case R.id.loopsiwtch:
-                if (isChecked) {
-                    stateManager.setLoop(StateManager.LoopState.LOOP_ONLY_ONE);
-                } else {
-                    stateManager.setLoop(StateManager.LoopState.NO_LOOP);
-                }
-                playSoundListener.onChangeLoopMode(isChecked);
-
-                break;
-            case R.id.repeatsiwtch:
-                if (isChecked) {
-                    setPlayerState(PlayerState.AB_REPEAT);
-                } else {
-                    moveToIdleState();
-                }
-                break;
-            case R.id.shuffleSiwtch:
-                stateManager.setRandom(isChecked);
-                break;
+        if (id == R.id.loopsiwtch) {
+            if (isChecked) {
+                stateManager.setLoop(StateManager.LoopState.LOOP_ONLY_ONE);
+            } else {
+                stateManager.setLoop(StateManager.LoopState.NO_LOOP);
+            }
+            playSoundListener.onChangeLoopMode(isChecked);
+        } else if (id == R.id.repeatsiwtch) {
+            if (isChecked) {
+                setPlayerState(PlayerState.AB_REPEAT);
+            } else {
+                moveToIdleState();
+            }
+        } else if (id == R.id.shuffleSiwtch) {
+            stateManager.setRandom(isChecked);
         }
     }
 
@@ -750,60 +745,49 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     public int controlSound(View view) {
         int id = view.getId();
         String buttonName="";
-        switch (id) {
-            case R.id.ButtonRepeatMode:
-                changeABRepeatState(view);
-                buttonName = "ButtonRepeatMode";
-                break;
-
-            case R.id.ButtonPreviousRepeat:
-                if (playSoundListener != null) {
-                    playSoundListener.onPlayPreviousABRepeat();
+        if (id == R.id.ButtonRepeatMode) {
+            changeABRepeatState(view);
+            buttonName = "ButtonRepeatMode";
+        } else if (id == R.id.ButtonPreviousRepeat) {
+            if (playSoundListener != null) {
+                playSoundListener.onPlayPreviousABRepeat();
+            }
+            buttonName = "ButtonPreviousRepeat";
+        } else if (id == R.id.ButtonPlay) {
+            if (playSoundListener != null) {
+                if (playSoundListener.onIsNowPlaying()) {
+                    //1. 동작
+                    playSoundListener.onPausePlayingMusic();
+                    //2. 화면 제어
+                    changeToPlayButton(view);
+                } else {
+                    //1. 동작
+                    playSound(view);
+                    //2. 화면제어.
+                    changeToPauseButton(view);
                 }
-                buttonName = "ButtonPreviousRepeat";
-                break;
-
-            case R.id.ButtonPlay:
-
-                if (playSoundListener != null) {
-                    if (playSoundListener.onIsNowPlaying()) {
-                        //1. 동작
-                        playSoundListener.onPausePlayingMusic();
-                        //2. 화면 제어
-                        changeToPlayButton(view);
-                    } else {
-                        //1. 동작
-                        playSound(view);
-                        //2. 화면제어.
-                        changeToPauseButton(view);
-                    }
-                }
-                buttonName = "ButtonPlay";
-                break;
-            case R.id.ButtonNextRepeat:
-                if (playSoundListener != null) {
-                    playSoundListener.onPlayNextABRepeat();
-                }
-                buttonName = "ButtonNextRepeat";
-                break;
+            }
+            buttonName = "ButtonPlay";
+        } else if (id == R.id.ButtonNextRepeat) {
+            if (playSoundListener != null) {
+                playSoundListener.onPlayNextABRepeat();
+            }
+            buttonName = "ButtonNextRepeat";
 
             // 다음 구간 반복 점프
-            case R.id.ButtonPrevious:
-                if (playSoundListener != null) {
-                    playSoundListener.onPrevTrack();
-                }
-                buttonName = "ButtonPrevious";
-                break;
-            case R.id.ButtonStop:
-                stopSound();
-                buttonName = "ButtonStop";
-                break;
-            case R.id.ButtonNext:
-                if (playSoundListener != null) {
-                    playSoundListener.onNextTrack();
-                }
-                buttonName = "ButtonNext";
-                break;
+        } else if (id == R.id.ButtonPrevious) {
+            if (playSoundListener != null) {
+                playSoundListener.onPrevTrack();
+            }
+            buttonName = "ButtonPrevious";
+        } else if (id == R.id.ButtonStop) {
+            stopSound();
+            buttonName = "ButtonStop";
+        } else if (id == R.id.ButtonNext) {
+            if (playSoundListener != null) {
+                playSoundListener.onNextTrack();
+            }
+            buttonName = "ButtonNext";
         }
         Utility.sendEventGoogleAnalytics(getContext(), CONSTANTS.screenName(CONSTANTS.PAGE_PLAYER), buttonName );
         return 1;
