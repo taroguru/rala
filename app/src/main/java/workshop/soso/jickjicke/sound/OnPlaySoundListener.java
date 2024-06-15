@@ -98,6 +98,18 @@ public interface OnPlaySoundListener {
     * */
     MediaPlayerStateMachine.State onGetPlayerState();
 
+    /**
+     * 플레이 속도 조절
+     * @param speed 플레이 속도. SPEED * 100%
+     * @return 속도 설정 성공 여부.
+     */
+    boolean onChangePlaybackSpeed(float speed);
+
+    /**
+     * 현재 플레이 속도
+     * @return 플레이 속도
+     */
+    float onGetPlaybackSpeed();
 
 }
 
