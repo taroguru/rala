@@ -939,6 +939,10 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     private int calculateRandomIndex(int currentIndex, int playlistLength){
+        if(playlistLength <= 1){
+            return currentIndex;
+        }
+
         Random random = new Random();
         int candidate = 0;
         do{
