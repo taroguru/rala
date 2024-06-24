@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/white</item>
         <!-- Light Indigo  <item name="colorPrimaryDark">#3949AB</item> -->
         <item name="colorPrimaryDark">#BDBDBD</item>
+        <item name="colorSecondary">@color/white</item>
         <!-- Dark Indigo -->
         <item name="colorAccent">@color/signature_color_accent</item>
     </style>
