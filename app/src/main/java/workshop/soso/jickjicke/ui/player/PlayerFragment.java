@@ -684,10 +684,12 @@ public class PlayerFragment extends Fragment implements OnFloatingButtonStyleCha
     }
 
     public void refreshTimeLabel() {
-//        DLog.v("CurrentState = " + playSoundListener.onGetPlayerState());
         if (playSoundListener != null && textCurrentTime != null){// && isStarted()) {
             String currentTimeStr = Utility.convertMsecToMin(playSoundListener.onGetCurrentPosition());
             textCurrentTime.setText(currentTimeStr);
+
+            String durationStr = Utility.convertMsecToMin(playSoundListener.onGetDuration());
+            textTotalTime.setText(durationStr);
         }
     }
 
