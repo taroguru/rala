@@ -465,6 +465,16 @@ public class MainActivity extends AppCompatActivity implements OnPlaySoundListen
     }
 
     @Override
+    public boolean onChangePlaybackSpeed(float speed) {
+        return false;
+    }
+
+    @Override
+    public float onGetPlaybackSpeed() {
+        return 0;
+    }
+
+    @Override
     public int onGetDuration() {
         int duration = -1;
         if (isUsableSoundService()) {
