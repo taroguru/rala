@@ -425,19 +425,16 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         try{
-            if(intent == null) {
-                DLog.d(CONSTANTS.LOG_LIFECYCLE, "Null intent is received");
-                return super.onStartCommand(intent, flags, startId);
+            if(intent == null || intent.getAction() == null) {
+                String source = null == intent ? "intent" : "action";
+                DLog.d(CONSTANTS.LOG_LIFECYCLE, source + " is null. flags = " + flags + " bits=" + Integer.toBinaryString (flags));
+
+                return START_STICKY;
             }
 
             String action = intent.getAction();
-            DLog.d(CONSTANTS.LOG_LIFECYCLE, "onStartCommand() : " + action);
 
-            if(action == null || action.isEmpty())
-            {
-                DLog.v("Empty Action.");
-            }
-            else if(action.equals(ACTION.StartSoundService)){
+            if(action.equals(ACTION.StartSoundService)){
                 DLog.v("Start Foreground Service");
                 startForegroundService();
             }
@@ -480,8 +477,7 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 DLog.v("unknown action : " + action);
             }
         }catch(NullPointerException e){
-
-            super.onStartCommand(intent, flags, startId);
+            e.printStackTrace();
         }
         return START_STICKY;
     }
@@ -641,6 +637,11 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
     private void initMediaPlayer() {
         //1. create and set mediaplayer
         DLog.d(LOG_TAG, "initMediaPlayer");
+        if(mediaPlayer != null)
+        {
+            mediaPlayer.reset();
+            mediaPlayer.release();
+        }
         mediaPlayer = new StateSoundPlayer();
         mediaPlayer.setContext(this);
 
