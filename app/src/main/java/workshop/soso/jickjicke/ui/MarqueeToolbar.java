@@ -49,9 +49,14 @@ public class MarqueeToolbar extends Toolbar {
             Field field = Toolbar.class.getDeclaredField("mTitleTextView");
             field.setAccessible(true);
             title = (TextView) field.get(this);
-            title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-            title.setMarqueeRepeatLimit(-1);
-            return true;
+            if(title != null){
+                title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+                title.setMarqueeRepeatLimit(-1);
+                return true;
+            }
+            else {
+                return false;
+            }
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
             return false;
