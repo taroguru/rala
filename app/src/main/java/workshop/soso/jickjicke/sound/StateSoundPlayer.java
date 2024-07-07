@@ -35,9 +35,12 @@ public class StateSoundPlayer extends MediaPlayer {
 
     @Override
     public void reset() throws IllegalStateException{
-        stateMachine.notifyReset();
-        super.reset();
-
+        try{
+            stateMachine.notifyReset();
+            super.reset();
+        }catch(IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
