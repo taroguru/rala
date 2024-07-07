@@ -289,7 +289,8 @@ public class StateManager extends Application implements Serializable {
     }
 
     public boolean isCreateNotificationChannel(){
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        //get sharedpreference
+        SharedPreferences sp =  PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         return sp.getBoolean(PREF_CREATE_NOTIFICATION_CHANNEL,false);
     }
 
@@ -484,7 +485,9 @@ public class StateManager extends Application implements Serializable {
     @Override
     public String toString() {
         //모든 멤버를 출력하자.
-        String buffer = String.format(TAG + " ISLOOP : " + String.valueOf(LoopState.toInteger(getLoop()))
+        String buffer;
+        try{
+            buffer = String.format(TAG + " ISLOOP : " + String.valueOf(LoopState.toInteger(getLoop()))
                 + ", ABRepeatList : " + abRepeatList.toString()
                 + ", currentPath : " + currentPath.toString()
                 + ", currentPlayListIndex : " + String.valueOf(getCurrentPlayListPosition())
@@ -494,6 +497,11 @@ public class StateManager extends Application implements Serializable {
                 + ", filename : " + String.valueOf((getCurrentPlayItem() != null) ? getCurrentPlayItem().getAudio().getName() : "null")
                 + ", entireplaylist size : " + String.valueOf((entirePlayList != null) ? entirePlayList.size() : "null")
         );
+        }catch(NullPointerException e){
+            e.printStackTrace();
+            buffer = "null";
+        }
+
         return buffer;
     }
 
