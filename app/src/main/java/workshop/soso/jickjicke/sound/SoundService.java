@@ -1,5 +1,7 @@
 package workshop.soso.jickjicke.sound;
 
+import static android.Manifest.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -11,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -253,10 +256,18 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         rescheduleTimerTask();
     }
 
+    @SuppressLint("ForegroundServiceType")
     private void startForegroundService() {
         DLog.d(CONSTANTS.LOG_LIFECYCLE, "startForegroundService");
         makeNotificationBuilder();
-        startForeground(CONSTANTS.NOTIFICATIONID, mBuilder.build());
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            startForeground(CONSTANTS.NOTIFICATIONID, mBuilder.build());
+        } else {
+            startForeground(CONSTANTS.NOTIFICATIONID, mBuilder.build(),
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        }
+
+
     }
 
     //전화가 왔을 때 재생중이면 일시정지
@@ -564,10 +575,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         //notification channel for oreo
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            StateManager stateManager = getStateManager(this);
-
-            if(!stateManager.isCreateNotificationChannel())
-            {
                 NotificationChannel notificationChannel = new NotificationChannel(CONSTANTS.NOTICHANNELID,getString(R.string.noti_player_name), NotificationManager.IMPORTANCE_LOW);
                 notificationChannel.setDescription(getString(R.string.channel_description));
                 notificationChannel.enableLights(false);
@@ -577,10 +584,6 @@ public class SoundService extends Service implements MediaPlayer.OnCompletionLis
                 notificationChannel.setShowBadge(false);
 
                 mNotificationManager.createNotificationChannel(notificationChannel);
-
-                stateManager.setCreateNotificationChannel(true);
-            }
-
         }
 
         mBuilder =
