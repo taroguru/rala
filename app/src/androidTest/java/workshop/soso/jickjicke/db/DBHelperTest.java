@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 
 import workshop.soso.jickjicke.Audio;
+import workshop.soso.jickjicke.PlayItem;
 import workshop.soso.jickjicke.PlayList;
 import workshop.soso.jickjicke.StateManager;
 import workshop.soso.jickjicke.util.DLog;
@@ -30,7 +31,6 @@ import static org.junit.Assert.assertTrue;
 public class DBHelperTest {
     private Context context;
     private StateManager stateManager;
-
 
     @Before
     public void setup() {
@@ -92,6 +92,7 @@ public class DBHelperTest {
 
         //하나를 추가해서
         Audio audio = audiolist.get(0);
+        Uri soundFileUri = DBHelper.insertFileInfo(context.getContentResolver(), audio);
         DBHelper.insertPlayItemToCurrentPlaylist(context, audio);
 
         //현재 플레이리스트를 갱신하고
@@ -100,7 +101,7 @@ public class DBHelperTest {
 
         //현재 플레이리스트가 하나 늘었는지 확인
         int afterSize = currentPlaylist.size();
-        Audio addedAudio = (Audio)currentPlaylist.getLast();
+        Audio addedAudio = ((PlayItem)currentPlaylist.getLast()).getAudio();
 
         assertEquals(beforeSize+1, afterSize);
         assertEquals(addedAudio.getId(), audio.getId());
