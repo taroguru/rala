@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -46,71 +47,41 @@ public class StartActivity extends AppCompatActivity {
         titleTextList.add((TextView)findViewById(R.id.app_fourth));
         underLine = (TextView)findViewById(R.id.underlinetext);
 
-
-        requestExtRead();
-        //requestExtWrite();
-        //requestReadPhoneState();
-
+        requestAllPermission();
     }
 
-    private void requestReadPhoneState() {
-
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            requestPermissions(
-                    new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                    Permissions.READ_PHONE_STATE);
-        }else {
-            hasReadPhoneState = true;
-            if(hasExtReadPermission && hasExtWritePermission){
-                ;
-            }
-        }
-    }
-
-    private void requestExtRead()
-    {
-        DLog.d("requestExtReadPermission");
-        //request audio file read permission
-        String permissionStringForRead="";
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        {
-            permissionStringForRead = Manifest.permission.READ_MEDIA_AUDIO;
-        }
-        else{
-            permissionStringForRead = Manifest.permission.READ_EXTERNAL_STORAGE;
-        }
-        int permissionCheck = ContextCompat.checkSelfPermission(this, permissionStringForRead);
-
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            //permissoin denied
-
-            requestPermissions(
-                    new String[]{permissionStringForRead},
-                    Permissions.EXTERNAL_READ);
-        } else {
-            hasExtReadPermission = true;
-            DLog.v("has external disk read permission");
+    private void requestAllPermission() {
+        //전체 권한이 있으면 실행, 아니면 권한 요청
+        if(checkAllPermission()){
             startMainActivity();
-            //requestExtWrite();
+        } else {
+            requestPermissions( new String[]{
+                            Manifest.permission.READ_PHONE_STATE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
     }
 
-    private void requestExtWrite()
-    {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if(permissionCheck== PackageManager.PERMISSION_DENIED){
-            requestPermissions(
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    Permissions.EXTERNAL_WRITE);
-        }else {
+    private boolean checkAllPermission(){
+        //android 29부터는 mediafile read에 별도 퍼미션 필요 없음
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
+            hasExtReadPermission = true;
+        }else{
+            hasExtReadPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
             hasExtWritePermission = true;
-            DLog.v("has external disk write permission");
-            requestReadPhoneState();
+        }else{
+            hasExtWritePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
+
+        hasReadPhoneState = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED;
+
+        return hasExtReadPermission && hasExtWritePermission && hasReadPhoneState;
     }
+
     private void startMainActivity() {
         //AnimationSet animationSet = new AnimationSet(true);
 
@@ -161,6 +132,7 @@ public class StartActivity extends AppCompatActivity {
         underLine.startAnimation(animationUnderline);
 
         Handler handler = new Handler();
+        Log.d("StartActivity", "start MainActivity");
         handler.postDelayed(() -> {
 //                Intent intent = new Intent(StartActivity.this, MainActivity.class);
 //                startActivity(intent);
@@ -181,7 +153,6 @@ public class StartActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     hasExtReadPermission = true;
-                    requestExtWrite();
                 } else {
                     finishAffinity();
                 }
@@ -192,7 +163,6 @@ public class StartActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     hasExtWritePermission = true;
-                    requestReadPhoneState();
                 } else {
                     finishAffinity();
                 }
@@ -208,11 +178,10 @@ public class StartActivity extends AppCompatActivity {
                 } else {
                     ShortTask.showSnack(this, R.string.cannotPauseWhenIncoming);
                 }
-
-                if (hasExtReadPermission && hasExtWritePermission) {
-                    startMainActivity();
-                }
-                break;
+            break;
+        }
+        if(hasExtReadPermission && hasExtWritePermission && hasReadPhoneState) {
+            startMainActivity();
         }
     }
 }
